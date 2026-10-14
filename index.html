@@ -1,0 +1,2432 @@
+<!DOCTYPE html>
+<html lang="bn" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>হাতিয়া তথ্য ও সেবা ডিরেক্টরি</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Hind Siliguri', sans-serif; }
+    @media print {
+      body * { visibility: hidden; }
+      #printableArea, #printableArea * { visibility: visible; }
+      #printableArea { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
+      .print-header { display: block !important; text-align: center; margin-bottom: 20px; }
+    }
+    .print-header { display: none; }
+
+    body.logged-out-lock #printableArea, 
+    body.logged-out-lock nav, 
+    body.logged-out-lock header,
+    body.logged-out-lock footer {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-300">
+
+  <!-- Emergency Announcement Bar -->
+  <div class="bg-red-600 text-white text-xs py-1.5 px-4 font-medium overflow-hidden whitespace-nowrap shadow-inner flex items-center no-print">
+    <span class="bg-red-800 px-2 py-0.5 rounded text-[11px] font-bold mr-2 uppercase tracking-wider flex-shrink-0"><i class="fa-solid fa-bullhorn mr-1"></i> জরুরি ঘোষণা:</span>
+    <marquee id="announcementText" scrollamount="4" class="flex-grow">হাতিয়া উপজেলা স্বাস্থ্য কমপ্লেক্সে জরুরি রক্তদানের প্রয়োজনে ডোনার তালিকা থেকে সরাসরি যোগাযোগ করুন। যেকোনো তথ্য সংশোধনে এডমিনের সাথে যোগাযোগ করুন।</marquee>
+    <button onclick="openNoticeModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] px-2 py-0.5 rounded ml-2 font-bold shadow flex-shrink-0">
+      <i class="fa-solid fa-circle-info"></i> বিস্তারিত নোটিশ
+    </button>
+    <button id="editNoticeBtn" onclick="openAnnouncementModal()" class="hidden bg-amber-500 hover:bg-amber-600 text-white text-[10px] px-2 py-0.5 rounded ml-2 font-bold shadow flex-shrink-0">
+      <i class="fa-solid fa-pen-to-square"></i> নোটিশ এডিট
+    </button>
+  </div>
+
+  <!-- Header with 3-Dot Dropdown Menu -->
+  <header class="bg-emerald-700 dark:bg-emerald-900 text-white shadow-lg sticky top-0 z-40 transition-colors no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center gap-3">
+      
+      <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('directory')">
+        <i class="fa-solid fa-hand-holding-medical text-3xl text-emerald-200"></i>
+        <div>
+          <h1 class="text-xl md:text-2xl font-bold tracking-wide">হাতিয়া তথ্য ও সেবা ডিরেক্টরি</h1>
+          <p class="text-xs text-emerald-100">উপজেলা ভিত্তিক শিক্ষা, স্বাস্থ্য, রক্তদান ও পর্যটন সংগ্রহশালা</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 relative">
+        <div class="hidden sm:flex items-center gap-2 bg-emerald-800/80 dark:bg-emerald-950/80 px-3 py-1.5 rounded-lg border border-emerald-600 text-xs font-medium">
+          <div><i class="fa-solid fa-eye text-emerald-300 mr-1"></i> ভিউ: <span id="totalViewsDisplay" class="font-bold text-white">0</span></div>
+          <div class="border-l border-emerald-600 pl-3"><i class="fa-solid fa-users text-blue-300 mr-1"></i> ইউজার: <span id="totalLoginsDisplay" class="font-bold text-white">0</span></div>
+        </div>
+
+        <div class="relative">
+          <button onclick="toggleHeaderMenu()" class="bg-emerald-800 hover:bg-emerald-900 text-white w-9 h-9 rounded-lg flex items-center justify-center shadow border border-emerald-600 transition" title="মেনু">
+            <i class="fa-solid fa-ellipsis-vertical text-lg"></i>
+          </button>
+
+          <div id="headerDropdownMenu" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-xl shadow-2xl border dark:border-slate-700 p-2 z-50 space-y-1.5 text-xs">
+            
+            <div class="px-3 py-1.5 border-b dark:border-slate-700 sm:hidden text-[11px] text-slate-500">
+              ভিউ: <span id="totalViewsMobile" class="font-bold">0</span> | ইউজার: <span id="totalLoginsMobile" class="font-bold">0</span>
+            </div>
+
+            <button onclick="openQrModal(); toggleHeaderMenu();" class="w-full text-left px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg flex items-center gap-2 font-medium">
+              <i class="fa-solid fa-qrcode text-teal-600"></i> কিউআর কোড
+            </button>
+
+            <button onclick="window.print(); toggleHeaderMenu();" class="w-full text-left px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg flex items-center gap-2 font-medium">
+              <i class="fa-solid fa-file-pdf text-blue-600"></i> পিডিএফ ডাউনলোড
+            </button>
+
+            <button onclick="toggleDarkMode();" class="w-full text-left px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg flex items-center gap-2 font-medium">
+              <i id="themeIconMenu" class="fa-solid fa-moon text-emerald-600"></i> <span id="themeTextMenu">ডার্ক মোড</span>
+            </button>
+
+            <div id="adminBackupRestoreSection" class="hidden space-y-1.5 border-t dark:border-slate-700 pt-1.5 mt-1.5">
+              <button onclick="backupData(); toggleHeaderMenu();" class="w-full text-left px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg flex items-center gap-2 font-medium text-blue-500">
+                <i class="fa-solid fa-download"></i> ডাটা ব্যাকআপ (এডমিন)
+              </button>
+              <button onclick="restoreData(); toggleHeaderMenu();" class="w-full text-left px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg flex items-center gap-2 font-medium text-emerald-500">
+                <i class="fa-solid fa-upload"></i> ডাটা রিস্টোর (এডমিন)
+              </button>
+            </div>
+
+            <div class="border-t dark:border-slate-700 pt-1.5 mt-1.5"></div>
+            <div id="headerDropdownAuthArea"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <div class="bg-white dark:bg-slate-800 border-b dark:border-slate-700 shadow-sm transition-colors no-print">
+    <div class="max-w-7xl mx-auto px-4 flex gap-2 md:gap-6 overflow-x-auto">
+      <button onclick="switchTab('directory')" id="tabBtnDirectory" class="py-3 px-4 font-semibold text-emerald-700 dark:text-emerald-400 border-b-2 border-emerald-600 flex items-center gap-2 whitespace-nowrap">
+        <i class="fa-solid fa-list"></i> শিক্ষা প্রতিষ্ঠান তালিকা
+      </button>
+      <button onclick="switchTab('hospital')" id="tabBtnHospital" class="py-3 px-4 font-semibold text-slate-600 dark:text-slate-300 border-b-2 border-transparent hover:text-emerald-600 flex items-center gap-2 whitespace-nowrap">
+        <i class="fa-solid fa-hospital"></i> হাসপাতাল ও স্বাস্থ্যসেবা
+      </button>
+      <button onclick="switchTab('bloodDonation')" id="tabBtnBlood" class="py-3 px-4 font-semibold text-slate-600 dark:text-slate-300 border-b-2 border-transparent hover:text-emerald-600 flex items-center gap-2 whitespace-nowrap">
+        <i class="fa-solid fa-droplet text-red-500"></i> রক্তদান ও ডোনার তালিকা
+      </button>
+      <button onclick="switchTab('aboutHatia')" id="tabBtnAboutHatia" class="py-3 px-4 font-semibold text-slate-600 dark:text-slate-300 border-b-2 border-transparent hover:text-emerald-600 flex items-center gap-2 whitespace-nowrap">
+        <i class="fa-solid fa-map-marked-alt"></i> হাতিয়া পরিচিতি ও পর্যটন
+      </button>
+      <button onclick="switchTab('jobCircular')" id="tabBtnJob" class="py-3 px-4 font-semibold text-slate-600 dark:text-slate-300 border-b-2 border-transparent hover:text-emerald-600 flex items-center gap-2 whitespace-nowrap">
+        <i class="fa-solid fa-briefcase text-teal-500"></i> চাকরির খবর ও সার্কুলার
+      </button>
+      <button onclick="switchTab('emergencyHotline')" id="tabBtnHotline" class="py-3 px-4 font-semibold text-slate-600 dark:text-slate-300 border-b-2 border-transparent hover:text-emerald-600 flex items-center gap-2 whitespace-nowrap">
+        <i class="fa-solid fa-phone-volume text-amber-500"></i> জরুরি হটলাইন সেবা
+      </button>
+      <button onclick="switchTab('favorites')" id="tabBtnFavorites" class="py-3 px-4 font-semibold text-slate-600 dark:text-slate-300 border-b-2 border-transparent hover:text-red-500 flex items-center gap-2 whitespace-nowrap">
+        <i class="fa-solid fa-heart text-red-500"></i> আমার ফেভারিট
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full" id="printableArea">
+    <div class="print-header">
+      <h2 class="text-2xl font-bold text-emerald-800">হাতিয়া তথ্য ও সেবা ডিরেক্টরি</h2>
+      <p class="text-xs text-slate-600">উপজেলা ভিত্তিক শিক্ষা, স্বাস্থ্য, রক্তদান ও পর্যটন সংগ্রহশালা</p>
+      <hr class="my-2 border-slate-400">
+    </div>
+
+    <div id="alertBox" class="hidden mb-4 p-4 rounded-lg font-medium shadow-sm transition-all duration-300 no-print"></div>
+
+    <!-- TAB 1: Directory List -->
+    <section id="directoryTab" class="space-y-6">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div class="bg-blue-50 dark:bg-slate-800 border border-blue-200 dark:border-slate-700 p-3.5 rounded-xl text-center shadow-sm space-y-1">
+          <span class="text-xs font-bold text-blue-800 dark:text-blue-400 block">🏫 স্কুল (মোট <span id="schoolTypeCount">0</span> টি)</span>
+          <div class="text-xs text-blue-900 dark:text-blue-200 font-semibold">
+            ছাত্র: <span id="schoolBoysCount">0</span> | ছাত্রী: <span id="schoolGirlsCount">0</span>
+          </div>
+          <div class="text-sm font-bold text-blue-700 dark:text-blue-300">মোট শিক্ষার্থী: <span id="schoolTotalCount">0</span> জন</div>
+        </div>
+
+        <div class="bg-amber-50 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 p-3.5 rounded-xl text-center shadow-sm space-y-1">
+          <span class="text-xs font-bold text-amber-800 dark:text-amber-400 block">🕌 মাদ্রাসা (মোট <span id="madrasaTypeCount">0</span> টি)</span>
+          <div class="text-xs text-amber-900 dark:text-amber-200 font-semibold">
+            ছাত্র: <span id="madrasaBoysCount">0</span> | ছাত্রী: <span id="madrasaGirlsCount">0</span>
+          </div>
+          <div class="text-sm font-bold text-amber-700 dark:text-amber-300">মোট শিক্ষার্থী: <span id="madrasaTotalCount">0</span> জন</div>
+        </div>
+
+        <div class="bg-emerald-50 dark:bg-slate-800 border border-emerald-200 dark:border-slate-700 p-3.5 rounded-xl text-center shadow-sm space-y-1">
+          <span class="text-xs font-bold text-emerald-800 dark:text-emerald-400 block">🎓 কলেজ/অন্যান্য (মোট <span id="collegeTypeCount">0</span> টি)</span>
+          <div class="text-xs text-emerald-900 dark:text-emerald-200 font-semibold">
+            ছাত্র: <span id="collegeBoysCount">0</span> | ছাত্রী: <span id="collegeGirlsCount">0</span>
+          </div>
+          <div class="text-sm font-bold text-emerald-700 dark:text-emerald-300">মোট শিক্ষার্থী: <span id="collegeTotalCount">0</span> জন</div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row gap-4 justify-between items-center transition-colors no-print">
+        <div class="relative w-full md:w-72">
+          <input type="text" id="searchInput" oninput="renderSchools()" placeholder="প্রতিষ্ঠানের নাম বা কোড দিয়ে খুঁজুন..." class="w-full pl-10 pr-4 py-2 border dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm bg-transparent">
+          <i class="fa-solid fa-search absolute left-3 top-3 text-slate-400"></i>
+        </div>
+        <div class="flex flex-wrap gap-2 w-full md:w-auto items-center">
+          <select id="filterUnion" onchange="renderSchools()" class="border dark:border-slate-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 font-medium text-slate-700 dark:text-slate-200">
+            <option value="ALL">📍 সকল এলাকা/ইউনিয়ন</option>
+            <option value="হাতিয়া পৌরসভা">হাতিয়া পৌরসভা (ওছখালী)</option>
+            <option value="তমরদ্দি">তমরদ্দি ইউনিয়ন</option>
+            <option value="বুড়িরচর">বুড়িরচর ইউনিয়ন</option>
+            <option value="জাহাজমারা">জাহাজমারা ইউনিয়ন</option>
+            <option value="চরঈশ্বর">চরঈশ্বর ইউনিয়ন</option>
+            <option value="চরকিং">চরকিং ইউনিয়ন</option>
+            <option value="সুখচর">সুখচর ইউনিয়ন</option>
+            <option value="নলচিরা">নলচিরা ইউনিয়ন</option>
+            <option value="সোনারচর">সোনারচর / নিঝুম দ্বীপ</option>
+          </select>
+          <select id="filterType" onchange="renderSchools()" class="border dark:border-slate-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-700 font-medium text-slate-700 dark:text-slate-200">
+            <option value="ALL">🏫 সকল ধরন</option>
+            <option value="স্কুল">স্কুল</option>
+            <option value="মাদ্রাসা">মাদ্রাসা</option>
+            <option value="কলেজ/অন্যান্য">কলেজ/অন্যান্য</option>
+          </select>
+          <button onclick="openAddSchoolModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow flex items-center gap-2 whitespace-nowrap">
+            <i class="fa-solid fa-plus-circle"></i> নতুন তথ্য যোগ করুন
+          </button>
+        </div>
+      </div>
+
+      <div id="areaBadgeHeader" class="text-sm font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-slate-800 p-2.5 rounded-lg border border-emerald-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span><i class="fa-solid fa-location-dot text-emerald-600 mr-2"></i>প্রদর্শিত হচ্ছে: <strong id="selectedAreaText">সকল এলাকা / ইউনিয়ন</strong></span>
+          <a id="unionMapLink" href="https://maps.google.com/?q=Hatia,+Noakhali" target="_blank" class="text-xs bg-blue-600 text-white px-2 py-0.5 rounded shadow hover:bg-blue-700 hidden items-center gap-1"><i class="fa-solid fa-map"></i> গুগল ম্যাপ দেখুন</a>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="totalStudentsSum" class="bg-slate-700 text-white text-xs px-2.5 py-1 rounded-full">মোট শিক্ষার্থী: 0 জন</span>
+          <span id="totalMatchCount" class="bg-emerald-600 text-white text-xs px-2.5 py-1 rounded-full">0 টি প্রতিষ্ঠান</span>
+        </div>
+      </div>
+
+      <div id="schoolListContainer" class="grid grid-cols-1 gap-6"></div>
+    </section>
+
+    <!-- SCHOOL DETAILS VIEW -->
+    <section id="schoolDetailTab" class="hidden space-y-6">
+      <button onclick="switchTab('directory')" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-lg flex items-center gap-2 no-print">
+        <i class="fa-solid fa-arrow-left"></i> তালিকায় ফিরে যান
+      </button>
+      <div id="schoolDetailContent" class="space-y-6"></div>
+    </section>
+
+    <!-- HOSPITAL TAB -->
+    <div id="hospitalTab" class="hidden space-y-6">
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6 border border-slate-100 dark:border-slate-700 space-y-6 transition-colors">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 border-b dark:border-slate-700 pb-4">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <i class="fa-solid fa-hospital text-emerald-600"></i> হাতিয়া হাসপাতাল ও স্বাস্থ্যসেবা ডিরেক্টরি
+            </h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">হাসপাতাল, ক্লিনিক, অ্যাম্বুলেন্স এবং জরুরি সেবার তালিকা</p>
+          </div>
+          <button onclick="openHospitalModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow flex items-center gap-2 no-print">
+            <i class="fa-solid fa-plus"></i> নতুন হাসপাতাল/সেবা যোগ করুন
+          </button>
+        </div>
+        <div id="hospitalListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+    </div>
+
+    <!-- BLOOD DONATION TAB -->
+    <div id="bloodDonationTab" class="hidden space-y-6">
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6 border border-slate-100 dark:border-slate-700 space-y-6 transition-colors">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 border-b dark:border-slate-700 pb-4">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <i class="fa-solid fa-droplet text-red-500"></i> হাতিয়া ব্লাড ডোনার ডিরেক্টরি
+            </h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">জরুরি রক্তদানের জন্য স্বেচ্ছাসেবী ডোনারদের তালিকা ও তথ্য</p>
+          </div>
+          <button onclick="openBloodModal()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow flex items-center gap-2 no-print">
+            <i class="fa-solid fa-user-plus"></i> ডোনার হিসেবে নাম যুক্ত করুন
+          </button>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 dark:bg-slate-700 p-3 rounded-xl border dark:border-slate-600 no-print">
+          <div class="flex items-center gap-3">
+            <label class="text-xs font-bold text-slate-700 dark:text-slate-200"><i class="fa-solid fa-filter mr-1"></i> রক্তের গ্রুপ ফিল্টার:</label>
+            <select id="filterBloodGroup" onchange="renderBloodDonors()" class="border dark:border-slate-600 rounded-lg px-3 py-1.5 text-xs font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 outline-none">
+              <option value="ALL">সকল গ্রুপ</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+            </select>
+          </div>
+          <button onclick="toggleEligibleDonorsFilter()" id="eligibleFilterBtn" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow transition flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-check"></i> শুধু এখন যারা রক্তদানে যোগ্য
+          </button>
+        </div>
+
+        <div id="bloodDonorListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+    </div>
+
+    <!-- ABOUT HATIA & TOURISM TAB -->
+    <section id="aboutHatiaTab" class="hidden space-y-8">
+      <div class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white rounded-2xl p-6 md:p-8 shadow-lg flex flex-col md:flex-row items-center gap-6">
+        <div class="w-24 h-24 md:w-32 md:h-32 bg-emerald-900 rounded-full flex items-center justify-center text-4xl border-4 border-emerald-300 shadow">
+          <i class="fa-solid fa-user-tie"></i>
+        </div>
+        <div class="text-center md:text-left space-y-2">
+          <span class="bg-emerald-600 text-xs px-3 py-1 rounded-full uppercase tracking-wider font-semibold">নোয়াখালী-৬ (হাতিয়া)</span>
+          <h2 class="text-2xl md:text-3xl font-bold">আবদুল হান্নান মাসউদ</h2>
+          <p class="text-emerald-100 text-sm md:text-base">মাননীয় সংসদ সদস্য, হাতিয়া সংসদীয় আসন</p>
+          <p class="text-xs text-emerald-200">হাতিয়া উপজেলার সার্বিক শিক্ষা ও সামাজিক উন্নয়নে প্রতিশ্রুতিবদ্ধ।</p>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border dark:border-slate-700 transition-colors">
+        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+          <i class="fa-solid fa-map-location-dot text-emerald-600"></i> হাতিয়া পরিচিতি, পর্যটন ও খাবার ডিরেক্টরি
+        </h3>
+        <button onclick="openTourismModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow flex items-center gap-2 no-print">
+          <i class="fa-solid fa-plus"></i> নতুন তথ্য যোগ করুন
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100 border-l-4 border-emerald-600 pl-3">১. হাতিয়া পরিচিতি ও ব্যক্তিত্ব</h3>
+        <div id="introListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100 border-l-4 border-emerald-600 pl-3">২. পর্যটন স্থানসমূহ</h3>
+        <div id="tourismListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100 border-l-4 border-emerald-600 pl-3">৩. প্রসিদ্ধ খাবার ও ঐতিহ্য</h3>
+        <div id="foodListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+    </section>
+
+    <!-- JOB CIRCULAR TAB -->
+    <section id="jobCircularTab" class="hidden space-y-6">
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6 border border-slate-100 dark:border-slate-700 space-y-6 transition-colors">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 border-b dark:border-slate-700 pb-4">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <i class="fa-solid fa-briefcase text-teal-500"></i> হাতিয়া জব সার্কুলার ও চাকরির খবর
+            </h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">স্থানীয় স্কুল, কলেজ, হাসপাতাল ও প্রতিষ্ঠানের প্রকাশিত চাকরির বিজ্ঞপ্তি</p>
+          </div>
+          <button id="addJobBtn" onclick="openJobModal()" class="hidden bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow flex items-center gap-2 no-print">
+            <i class="fa-solid fa-plus"></i> নতুন সার্কুলার যোগ করুন
+          </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="jobContainer"></div>
+      </div>
+    </section>
+
+    <!-- EMERGENCY HOTLINE TAB -->
+    <section id="emergencyHotlineTab" class="hidden space-y-6">
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6 border border-slate-100 dark:border-slate-700 space-y-6 transition-colors">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 border-b dark:border-slate-700 pb-4">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <i class="fa-solid fa-phone-volume text-amber-500"></i> হাতিয়া জরুরি হটলাইন ও সেবা ডিরেক্টরি
+            </h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">থানা, ফায়ার সার্ভিস, অ্যাম্বুলেন্স এবং জরুরি সরকারি অফিসের হটলাইন নম্বর</p>
+          </div>
+          <button id="addHotlineBtn" onclick="openHotlineModal()" class="hidden bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow flex items-center gap-2 no-print">
+            <i class="fa-solid fa-plus"></i> নতুন হটলাইন যোগ করুন
+          </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="hotlineContainer"></div>
+      </div>
+    </section>
+
+    <!-- FAVORITES TAB -->
+    <section id="favoritesTab" class="hidden space-y-6">
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6 border border-slate-100 dark:border-slate-700 space-y-6 transition-colors">
+        <div class="border-b dark:border-slate-700 pb-4">
+          <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+            <i class="fa-solid fa-heart text-red-500"></i> আমার ফেভারিট তালিকা
+          </h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">আপনার সেভ করা গুরুত্বপূর্ণ স্কুল, হাসপাতাল, ডোনার বা হটলাইন নম্বরসমূহ</p>
+        </div>
+        <div id="favoritesListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- QR Code Modal -->
+  <div id="qrModal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-2xl max-w-sm w-full p-6 shadow-2xl text-center relative space-y-4">
+      <button onclick="closeQrModal()" class="absolute right-4 top-4 text-slate-400 hover:text-slate-600"><i class="fa-solid fa-times text-xl"></i></button>
+      <h3 class="text-xl font-bold">ওয়েবসাইট কিউআর কোড</h3>
+      <div class="bg-white p-4 inline-block rounded-xl shadow border">
+        <img id="qrCodeImage" src="" alt="QR Code" class="w-48 h-48 mx-auto object-contain">
+      </div>
+      <p class="text-xs text-slate-500 dark:text-slate-400">ক্যামেরা দিয়ে স্ক্যান করে সরাসরি সাইটটি ভিজিট করুন।</p>
+    </div>
+  </div>
+
+  <!-- ১. সাধারণ ইউজার লগইন পপআপ (User Auth Modal) -->
+  <div id="userAuthModal" class="fixed inset-0 bg-slate-950/90 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-2xl max-w-md w-full p-6 shadow-2xl relative transition-colors border dark:border-slate-700">
+      <button onclick="closeUserAuthModal()" class="absolute right-4 top-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-times text-xl"></i></button>
+      <div class="text-center mb-4">
+        <div class="w-12 h-12 bg-emerald-600/20 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl"><i class="fa-solid fa-user"></i></div>
+        <h3 id="userAuthModalTitle" class="text-xl font-bold">সাধারণ ইউজার প্রবেশ</h3>
+        <p class="text-xs text-slate-500 mt-1">আপনার অ্যাকাউন্ট দিয়ে লগইন করুন</p>
+      </div>
+      <form id="userAuthForm" onsubmit="handleUserAuthSubmit(event)" class="space-y-3">
+        <div id="userRegNameWrapper" class="hidden">
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">আপনার পূর্ণ নাম <span class="text-red-500">*</span></label>
+          <input type="text" id="userAuthName" placeholder="এনআইডি অনুযায়ী নাম" class="w-full border dark:border-slate-600 rounded-lg p-2.5 text-sm outline-none bg-transparent">
+        </div>
+        <div id="userRegNidWrapper" class="hidden">
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">NID নম্বর <span class="text-red-500">*</span></label>
+          <input type="text" id="userAuthNid" placeholder="১০, ১৩ বা ১৭ ডিজিট" class="w-full border dark:border-slate-600 rounded-lg p-2.5 text-sm outline-none bg-transparent">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">মোবাইল নম্বর <span class="text-red-500">*</span></label>
+          <input type="tel" id="userAuthPhone" required placeholder="017XXXXXXXX" class="w-full border dark:border-slate-600 rounded-lg p-2.5 text-sm outline-none bg-transparent">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">পাসওয়ার্ড <span class="text-red-500">*</span></label>
+          <input type="password" id="userAuthPass" required placeholder="পাসওয়ার্ড" class="w-full border dark:border-slate-600 rounded-lg p-2.5 text-sm outline-none bg-transparent">
+        </div>
+        <button type="submit" id="userAuthSubmitBtn" class="w-full py-2.5 bg-emerald-600 text-white rounded-lg font-semibold text-sm hover:bg-emerald-700 shadow-md transition">লগইন করুন</button>
+      </form>
+      <div class="mt-4 pt-4 border-t dark:border-slate-700 flex justify-between items-center text-xs">
+        <button onclick="switchUserAuthSubMode('register')" id="userRegToggleBtn" class="text-emerald-600 font-bold hover:underline">নতুন অ্যাকাউন্ট খুলুন</button>
+        <button onclick="switchUserAuthSubMode('login')" id="userLoginToggleBtn" class="hidden text-emerald-600 font-bold hover:underline">লগইন করুন</button>
+        <button onclick="switchUserAuthSubMode('forgot')" id="userForgotToggleBtn" class="hover:underline">পাসওয়ার্ড ভুলে গেছেন?</button>
+      </div>
+      <div class="mt-4 text-center border-t dark:border-slate-700 pt-3">
+        <button onclick="openAdminAuthModal()" class="text-xs text-amber-500 hover:underline font-semibold">⚡ আপনি কি অ্যাডমিন? অ্যাডমিন প্যানেল লগইন করুন →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ২. অ্যাডমিন লগইন পপআপ (Admin Auth Modal) -->
+  <div id="adminAuthModal" class="fixed inset-0 bg-slate-950/90 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 text-slate-100 rounded-2xl max-w-md w-full p-6 shadow-2xl relative border border-amber-500/30">
+      <button onclick="closeAdminAuthModal()" class="absolute right-4 top-4 text-slate-400 hover:text-white"><i class="fa-solid fa-times text-xl"></i></button>
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 bg-amber-600/20 text-amber-400 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">⚡</div>
+        <h3 class="text-xl font-bold text-amber-400">অ্যাডমিন প্যানেল প্রবেশ</h3>
+        <p class="text-xs text-slate-400 mt-1">শুধুমাত্র কতৃপক্ষের প্রবেশের জন্য সংরক্ষিত</p>
+      </div>
+      <form onsubmit="handleAdminAuthSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">অ্যাডমিন মোবাইল নম্বর <span class="text-amber-400">*</span></label>
+          <input type="tel" id="adminAuthPhone" required placeholder="017XXXXXXXX" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm outline-none focus:border-amber-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">সিক্রেট পাসওয়ার্ড <span class="text-amber-400">*</span></label>
+          <input type="password" id="adminAuthPass" required placeholder="••••••••" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm outline-none focus:border-amber-500">
+        </div>
+        <button type="submit" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-semibold text-sm shadow-lg shadow-amber-600/30 transition">অ্যাডমিন হিসেবে প্রবেশ করুন</button>
+      </form>
+      <div class="mt-4 text-center border-t border-slate-800 pt-3">
+        <button onclick="openUserAuthModal()" class="text-xs text-emerald-400 hover:underline font-semibold">← সাধারণ ইউজার লগইনে ফিরে যান</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ৩. অ্যাডমিন ওয়েলকাম পপআপ (Admin Welcome Popup) -->
+  <div id="adminWelcomeModal" class="fixed inset-0 bg-slate-950/90 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 text-slate-100 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative text-center space-y-4 border border-amber-500/40">
+      <button onclick="closeAdminWelcomeModal()" class="absolute right-4 top-4 text-slate-400 hover:text-white text-xl font-bold"><i class="fa-solid fa-times"></i></button>
+      <div class="w-16 h-16 bg-amber-600/20 text-amber-400 rounded-full flex items-center justify-center mx-auto text-2xl shadow">⚡</div>
+      <p class="text-sm sm:text-base leading-relaxed text-slate-300 font-medium">
+        "সবাই কেবল স্বপ্ন দেখে, কিন্তু খুব কম মানুষই নিজের হাতে সেই স্বপ্নকে বাস্তবে রূপ দিতে পারে। আপনি সেই বিরল মানুষদের একজন, যিনি একা হাতে একটি পুরো জনপদের ডিজিটাল রূপকার হয়ে উঠেছেন।"
+      </p>
+      <button onclick="closeAdminWelcomeModal()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-sm shadow-lg shadow-amber-600/30 transition">
+        অ্যাডমিন ড্যাশবোর্ডে প্রবেশ করুন
+      </button>
+    </div>
+  </div>
+
+  <!-- ৪. সাধারণ ইউজার ওয়েলকাম পপআপ (User Welcome Popup) -->
+  <div id="userWelcomeModal" class="fixed inset-0 bg-slate-950/90 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative text-center space-y-4 border dark:border-slate-700">
+      <button onclick="closeUserWelcomeModal()" class="absolute right-4 top-4 text-slate-400 hover:text-slate-600 text-xl font-bold"><i class="fa-solid fa-times"></i></button>
+      <div class="w-16 h-16 bg-emerald-600/20 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto text-2xl shadow">💚</div>
+      <p id="userWelcomeText" class="text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300 font-medium"></p>
+      <button onclick="closeUserWelcomeModal()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm shadow-md transition">
+        শুরু করুন
+      </button>
+    </div>
+  </div>
+
+  <!-- Announcement Edit Modal -->
+  <div id="announcementModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-xl max-w-md w-full p-6 shadow-xl relative space-y-4">
+      <button onclick="closeAnnouncementModal()" class="absolute right-4 top-4 text-slate-400"><i class="fa-solid fa-times"></i></button>
+      <h3 class="text-xl font-bold border-b dark:border-slate-700 pb-2">জরুরি ঘোষণা পরিবর্তন করুন</h3>
+      <form onsubmit="handleAnnouncementSubmit(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold mb-1">ঘোষণা বা নোটিশ টেক্সট <span class="text-red-500">*</span></label>
+          <textarea id="noticeInputText" required rows="3" class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+        </div>
+        <button type="submit" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-semibold text-sm shadow">সেভ করুন</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Notice Details Modal -->
+  <div id="noticeModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative space-y-4">
+      <button onclick="closeNoticeModal()" class="absolute right-4 top-4 text-slate-400"><i class="fa-solid fa-times text-xl"></i></button>
+      <h3 class="text-xl font-bold border-b dark:border-slate-700 pb-2 flex items-center gap-2"><i class="fa-solid fa-bullhorn text-red-500"></i> বর্তমান জরুরি ঘোষণা</h3>
+      <p id="fullNoticeContent" class="text-sm leading-relaxed p-4 bg-slate-50 dark:bg-slate-700 rounded-xl border dark:border-slate-600"></p>
+      <div class="text-right">
+        <button onclick="closeNoticeModal()" class="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-lg">বন্ধ করুন</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generic View Detail Modal -->
+  <div id="viewDetailModal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto">
+      <button onclick="closeViewDetailModal()" class="absolute right-4 top-4 text-slate-400"><i class="fa-solid fa-times text-xl"></i></button>
+      <div id="viewDetailModalContent"></div>
+    </div>
+  </div>
+
+  <!-- Image Zoom Modal -->
+  <div id="imageZoomModal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-4" onclick="closeImageZoom()">
+    <div class="relative max-w-3xl w-full flex justify-center items-center">
+      <button onclick="closeImageZoom()" class="absolute -top-10 right-0 text-white text-2xl"><i class="fa-solid fa-times"></i></button>
+      <img id="zoomedImage" src="" alt="Zoom" class="max-h-[85vh] max-w-full rounded-xl shadow-2xl border-4 border-white object-contain">
+    </div>
+  </div>
+
+  <!-- Hotline Add/Edit Modal -->
+  <div id="hotlineModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-xl max-w-md w-full p-6 shadow-xl relative space-y-4">
+      <button onclick="closeHotlineModal()" class="absolute right-4 top-4 text-slate-400"><i class="fa-solid fa-times"></i></button>
+      <h3 id="hotlineModalTitle" class="text-xl font-bold border-b dark:border-slate-700 pb-2">জরুরি হটলাইন তথ্য</h3>
+      <form onsubmit="handleHotlineSubmit(event)" class="space-y-3">
+        <input type="hidden" id="editingHotlineId" value="">
+        <div><label class="block text-xs font-semibold mb-1">ক্যাটাগরি / ট্যাগ *</label><input type="text" id="hotlineCategory" required placeholder="যেমন: পুলিশ সেবা, ফায়ার সার্ভিস" class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent"></div>
+        <div><label class="block text-xs font-semibold mb-1">প্রতিষ্ঠানের নাম *</label><input type="text" id="hotlineName" required placeholder="হাতিয়া থানা" class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent"></div>
+        <div><label class="block text-xs font-semibold mb-1">ঠিকানা বা বিবরণ *</label><input type="text" id="hotlineDesc" required placeholder="ওছখালী, হাতিয়া, নোয়াখালী" class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent"></div>
+        <div><label class="block text-xs font-semibold mb-1">হটলাইন নম্বর *</label><input type="text" id="hotlinePhone" required placeholder="01320111555" class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent"></div>
+        <button type="submit" class="w-full py-2 bg-amber-600 text-white rounded font-semibold text-sm">সংরক্ষণ করুন</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Job Modal -->
+  <div id="jobModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-xl max-w-md w-full p-6 shadow-xl relative space-y-4">
+      <button onclick="closeJobModal()" class="absolute right-4 top-4 text-slate-400"><i class="fa-solid fa-times"></i></button>
+      <h3 id="jobModalTitle" class="text-xl font-bold border-b dark:border-slate-700 pb-2">চাকরির বিজ্ঞপ্তি তথ্য</h3>
+      <form onsubmit="handleJobSubmit(event)" class="space-y-3">
+        <input type="hidden" id="editingJobId" value="">
+        <div><label class="block text-xs font-semibold mb-1">পদের নাম *</label><input type="text" id="jobTitle" required placeholder="যেমন: সহকারী শিক্ষক" class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent"></div>
+        <div><label class="block text-xs font-semibold mb-1">প্রতিষ্ঠানের নাম *</label><input type="text" id="jobOrg" required placeholder="যেমন: হাতিয়া আদর্শ উচ্চ বিদ্যালয়" class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent"></div>
+        <div><label class="block text-xs font-semibold mb-1">শেষ তারিখ *</label><input type="date" id="jobDeadline" required class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent"></div>
+        <div><label class="block text-xs font-semibold mb-1">বিস্তারিত ও যোগাযোগের বিবরণ *</label><textarea id="jobDesc" required rows="3" placeholder="বেতন, যোগ্যতা এবং যোগাযোগের মাধ্যম..." class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent"></textarea></div>
+        <button type="submit" class="w-full py-2 bg-teal-600 text-white rounded font-semibold text-sm">সংরক্ষণ করুন</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add/Edit School Modal -->
+  <div id="addSchoolModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-xl max-w-3xl w-full p-6 shadow-xl relative space-y-6 my-8 max-h-[90vh] overflow-y-auto">
+      <button onclick="closeAddSchoolModal()" class="absolute right-4 top-4 text-slate-400"><i class="fa-solid fa-times text-xl"></i></button>
+      <div class="bg-blue-50 dark:bg-slate-700 border border-blue-200 dark:border-slate-600 p-3 rounded-lg text-blue-900 dark:text-blue-200 text-xs flex justify-between items-center">
+        <span>ভুল হলে হোয়াটসঅ্যাপে যোগাযোগ করুন:</span>
+        <a href="https://wa.me/8801782727709" target="_blank" class="bg-emerald-600 text-white px-2 py-1 rounded font-bold"><i class="fa-brands fa-whatsapp"></i> 01782727709</a>
+      </div>
+      <form id="schoolForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+        <input type="hidden" id="editingSchoolId" value="">
+        <h3 id="schoolModalTitle" class="text-xl font-bold border-b dark:border-slate-700 pb-2">নতুন প্রতিষ্ঠানের তথ্য যুক্ত করুন</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold mb-1">প্রতিষ্ঠানের নাম *</label>
+            <input type="text" id="schoolName" required class="w-full border dark:border-slate-600 rounded-lg p-2 text-sm bg-transparent">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">স্কুল কোড / EIIN *</label>
+            <input type="text" id="schoolCode" required class="w-full border dark:border-slate-600 rounded-lg p-2 text-sm bg-transparent">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">ধরন *</label>
+            <select id="schoolType" required class="w-full border dark:border-slate-600 rounded-lg p-2 text-sm bg-white dark:bg-slate-700">
+              <option value="স্কুল">স্কুল</option>
+              <option value="মাদ্রাসা">মাদ্রাসা</option>
+              <option value="কলেজ/অন্যান্য">কলেজ/অন্যান্য</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">ইউনিয়ন / এলাকা *</label>
+            <select id="schoolLocation" required class="w-full border dark:border-slate-600 rounded-lg p-2 text-sm bg-white dark:bg-slate-700">
+              <option value="">-- এলাকা নির্বাচন করুন --</option>
+              <option value="হাতিয়া পৌরসভা">হাতিয়া পৌরসভা</option>
+              <option value="তমরদ্দি">তমরদ্দি ইউনিয়ন</option>
+              <option value="বুড়িরচর">বুড়িরচর ইউনিয়ন</option>
+              <option value="জাহাজমারা">জাহাজমারা ইউনিয়ন</option>
+              <option value="চরঈশ্বর">চরঈশ্বর ইউনিয়ন</option>
+              <option value="চরকিং">চরকিং ইউনিয়ন</option>
+              <option value="সুখচর">সুখচর ইউনিয়ন</option>
+              <option value="নলচিরা">নলচিরা ইউনিয়ন</option>
+              <option value="সোনারচর">সোনারচর / নিঝুম দ্বীপ</option>
+            </select>
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold mb-1">বিস্তারিত ঠিকানা *</label>
+            <input type="text" id="schoolAddress" required class="w-full border dark:border-slate-600 rounded-lg p-2 text-sm bg-transparent">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold mb-1">হেডমাস্টার / অধ্যক্ষ ও মোবাইল</label>
+            <input type="text" id="headDetails" class="w-full border dark:border-slate-600 rounded-lg p-2 text-sm bg-transparent">
+          </div>
+        </div>
+        <div class="border dark:border-slate-700 rounded-xl p-3 bg-slate-50 dark:bg-slate-700 space-y-3">
+          <div class="flex justify-between items-center">
+            <h4 class="font-bold text-xs">শ্রেণিভিত্তিক ছাত্র-ছাত্রী সংখ্যা</h4>
+            <button type="button" onclick="addClassRow()" class="px-2 py-1 bg-emerald-600 text-white text-xs rounded">+ শ্রেণি যোগ করুন</button>
+          </div>
+          <div id="classRowsContainer" class="space-y-2"></div>
+        </div>
+        <div class="border dark:border-slate-700 rounded-xl p-3 bg-slate-50 dark:bg-slate-700 space-y-3">
+          <div class="flex justify-between items-center">
+            <h4 class="font-bold text-xs">শিক্ষকদের তালিকা</h4>
+            <button type="button" onclick="addTeacherRow()" class="px-2 py-1 bg-emerald-600 text-white text-xs rounded">+ শিক্ষক যোগ করুন</button>
+          </div>
+          <div id="teachersContainer" class="space-y-2"></div>
+        </div>
+        <button type="submit" class="w-full py-2 bg-emerald-600 text-white rounded-lg font-semibold text-sm">সংরক্ষণ করুন</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Hospital Modal -->
+  <div id="hospitalModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-xl max-w-md w-full p-6 shadow-xl relative space-y-4">
+      <button onclick="closeHospitalModal()" class="absolute right-4 top-4 text-slate-400"><i class="fa-solid fa-times"></i></button>
+      <h3 id="hospitalModalTitle" class="text-xl font-bold border-b dark:border-slate-700 pb-2">হাসপাতাল তথ্য</h3>
+      <form onsubmit="handleHospitalSubmit(event)" class="space-y-3">
+        <input type="hidden" id="editingHospitalId" value="">
+        <div><label class="block text-xs font-semibold mb-1">নাম *</label><input type="text" id="hName" required class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent"></div>
+        <div><label class="block text-xs font-semibold mb-1">ধরন *</label><select id="hType" required class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-white dark:bg-slate-700"><option value="সরকারি হাসপাতাল">সরকারি হাসপাতাল</option><option value="বেসরকারি ক্লিনিক">বেসরকারি ক্লিনিক</option><option value="অ্যাম্বুলেন্স সার্ভিস">অ্যাম্বুলেন্স সার্ভিস</option><option value="জরুরি চিকিৎসক">জরুরি চিকিৎসক</option></select></div>
+        <div><label class="block text-xs font-semibold mb-1">ঠিকানা *</label><input type="text" id="hAddress" required class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent"></div>
+        <div><label class="block text-xs font-semibold mb-1">বিবরণ *</label><textarea id="hDetails" required rows="2" class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent"></textarea></div>
+        <div><label class="block text-xs font-semibold mb-1">হটলাইন / মোবাইল *</label><input type="text" id="hPhone" required class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent"></div>
+        <button type="submit" class="w-full py-2 bg-emerald-600 text-white rounded font-semibold text-sm">সংরক্ষণ</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Blood Donor Modal -->
+  <div id="bloodModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-xl max-w-md w-full p-6 shadow-xl relative space-y-4">
+      <button onclick="closeBloodModal()" class="absolute right-4 top-4 text-slate-400"><i class="fa-solid fa-times"></i></button>
+      <h3 id="bloodModalTitle" class="text-xl font-bold border-b dark:border-slate-700 pb-2">ডোনার তথ্য</h3>
+      <form onsubmit="handleBloodSubmit(event)" class="space-y-3">
+        <input type="hidden" id="editingDonorId" value="">
+        <div><label class="block text-xs font-semibold mb-1">নাম *</label><input type="text" id="bName" required class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent"></div>
+        <div><label class="block text-xs font-semibold mb-1">রক্তের গ্রুপ *</label><select id="bGroup" required class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-white dark:bg-slate-700"><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="O+">O+</option><option value="O-">O-</option><option value="AB+">AB+</option><option value="AB-">AB-</option></select></div>
+        <div class="grid grid-cols-2 gap-2">
+          <div><label class="block text-xs font-semibold mb-1">মোবাইল *</label><input type="tel" id="bPhone" required class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent"></div>
+          <div><label class="block text-xs font-semibold mb-1">মোট দান</label><input type="number" id="bDonateCount" min="1" value="1" required class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent"></div>
+        </div>
+        <div><label class="block text-xs font-semibold mb-1">ছবি</label><input type="file" id="bPhotoFile" accept="image/*" class="w-full border dark:border-slate-600 rounded p-1 text-xs bg-white dark:bg-slate-700"></div>
+        <div><label class="block text-xs font-semibold mb-1">শেষ রক্তদানের তারিখ *</label><input type="date" id="bLastDate" required class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent"></div>
+        <button type="submit" class="w-full py-2 bg-red-600 text-white rounded font-semibold text-sm">সংরক্ষণ</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tourism & Intro Modal -->
+  <div id="tourismModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-xl max-w-md w-full p-6 shadow-xl relative space-y-4">
+      <button onclick="closeTourismModal()" class="absolute right-4 top-4 text-slate-400"><i class="fa-solid fa-times"></i></button>
+      <h3 id="tourismModalTitle" class="text-xl font-bold border-b dark:border-slate-700 pb-2">তথ্য যোগ</h3>
+      <form onsubmit="handleTourismSubmit(event)" class="space-y-3">
+        <input type="hidden" id="editingTourismId" value="">
+        <div><label class="block text-xs font-semibold mb-1">বিভাগ *</label><select id="tCategory" required onchange="toggleDesignationField()" class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-white dark:bg-slate-700"><option value="পরিচিতি">পরিচিতি</option><option value="পর্যটন">পর্যটন</option><option value="খাবার">খাবার</option></select></div>
+        <div><label class="block text-xs font-semibold mb-1">শিরোনাম *</label><input type="text" id="tTitle" required class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent"></div>
+        <div id="designationWrapper"><label class="block text-xs font-semibold mb-1">পদবি/ভূমিকা</label><input type="text" id="tDesignation" class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent"></div>
+        <div><label class="block text-xs font-semibold mb-1">বিবরণ *</label><textarea id="tDesc" required rows="3" class="w-full border dark:border-slate-600 rounded p-2 text-sm bg-transparent"></textarea></div>
+        <button type="submit" class="w-full py-2 bg-emerald-600 text-white rounded font-semibold text-sm">জমা দিন</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-slate-200 text-center py-4 px-4 text-xs md:text-sm mt-auto space-y-2 shadow-inner no-print">
+    <div class="flex justify-center items-center gap-2 flex-wrap">
+      <span class="text-slate-300 font-medium">যে কোনো তথ্য এডিট বা সহায়তার জন্য সরাসরি হোয়াটসঅ্যাপে যোগাযোগ করুন:</span>
+      <a href="https://wa.me/8801782727709?text=হ্যালো,%20আমার%20তথ্য%20এডিট%20করতে%20সহায়তা%20প্রয়োজন।" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-lg font-bold flex items-center gap-1 shadow transition">
+        <i class="fa-brands fa-whatsapp text-base"></i> 01782727709
+      </a>
+    </div>
+    <p class="font-bold text-emerald-400 tracking-wide">হাতিয়া তথ্য ও সেবা ডিরেক্টরি © ২০২৬ | শিক্ষা, স্বাস্থ্য, রক্তদান ও পর্যটন সংগ্রহশালা</p>
+    <p class="text-slate-400 text-[11px] md:text-xs">এই পোর্টালে সকল প্রকার তথ্য এডিট, পরিবর্তন ও নিয়ন্ত্রণের একচ্ছত্র অধিকার শুধুমাত্র সম্মানিত হোস্ট এডমিনের সংরক্ষিত।</p>
+  </footer>
+
+  <!-- Firebase SDKs (Modular) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCyQGce2zJrZ4HhPKAZNvc9wKSTaBS7pY",
+      authDomain: "hatiya-caa88.firebaseapp.com",
+      projectId: "hatiya-caa88",
+      storageBucket: "hatiya-caa88.appspot.com",
+      messagingSenderId: "48788466375",
+      appId: "1:48788466375:web:7fb044d039dcb297d3ece2",
+      measurementId: "G-43F9HL23PP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.db = db;
+    window.collection = collection;
+    window.getDocs = getDocs;
+    window.addDoc = addDoc;
+    window.updateDoc = updateDoc;
+    window.deleteDoc = deleteDoc;
+    window.doc = doc;
+    window.setDoc = setDoc;
+
+    window.dispatchEvent(new Event('firebase-ready'));
+  </script>
+
+  <script>
+    function toggleDarkMode() {
+        const html = document.documentElement;
+        const isDark = html.classList.toggle('dark');
+        localStorage.setItem('hatia_theme', isDark ? 'dark' : 'light');
+        updateThemeUI(isDark);
+    }
+
+    function updateThemeUI(isDark) {
+        const iconMenu = document.getElementById('themeIconMenu');
+        const textMenu = document.getElementById('themeTextMenu');
+        if (isDark) {
+            if(iconMenu) iconMenu.className = "fa-solid fa-sun text-emerald-600";
+            if(textMenu) textMenu.innerText = "লাইট মোড";
+        } else {
+            if(iconMenu) iconMenu.className = "fa-solid fa-moon text-emerald-600";
+            if(textMenu) textMenu.innerText = "ডার্ক মোড";
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('hatia_theme') || 'light';
+        if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+            updateThemeUI(true);
+        } else {
+            document.documentElement.classList.remove('dark');
+            updateThemeUI(false);
+        }
+        
+        loadLocalSavedData();
+
+        if (!currentUser) {
+            document.body.classList.add('logged-out-lock');
+            openUserAuthModal();
+        }
+
+        loadAnnouncement();
+        trackPageView();
+        updateStatsDisplay();
+        renderAuthStatus();
+        renderClassRows();
+        addTeacherRow();
+        toggleDesignationField();
+    });
+
+    window.addEventListener('firebase-ready', async () => {
+        try {
+            await loadAllDataFromCloud();
+        } catch(err) {
+            console.log("Cloud load error:", err);
+        }
+        
+        // রিফ্রেশ করার পর বা সেভ করার পর সর্বশেষ কোন ট্যাবে ছিল, সেই ট্যাবেই পেজ ওপেন রাখবে
+        const savedTab = sessionStorage.getItem('active_hatia_tab') || 'directory';
+        switchTab(savedTab);
+    });
+
+    function saveAllDataLocally() {
+      const dataObj = {
+        schools,
+        hospitals,
+        donors,
+        tourismData,
+        hotlines,
+        jobs,
+        users,
+        favorites
+      };
+      localStorage.setItem('hatia_full_local_data_backup', JSON.stringify(dataObj));
+    }
+
+    function loadLocalSavedData() {
+      const saved = localStorage.getItem('hatia_full_local_data_backup');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.schools) schools = parsed.schools;
+          if (parsed.hospitals) hospitals = parsed.hospitals;
+          if (parsed.donors) donors = parsed.donors;
+          if (parsed.tourismData) tourismData = parsed.tourismData;
+          if (parsed.hotlines) hotlines = parsed.hotlines;
+          if (parsed.jobs) jobs = parsed.jobs;
+          if (parsed.users) users = parsed.users;
+          if (parsed.favorites) favorites = parsed.favorites;
+        } catch(e) {
+          console.log("Local data parse error:", e);
+        }
+      }
+    }
+
+    async function loadAllDataFromCloud() {
+      try {
+        const schoolSnap = await getDocs(collection(db, "schools"));
+        if (!schoolSnap.empty) {
+          schools = schoolSnap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+        }
+
+        const hospSnap = await getDocs(collection(db, "hospitals"));
+        if (!hospSnap.empty) {
+          hospitals = hospSnap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+        }
+
+        const donorSnap = await getDocs(collection(db, "donors"));
+        if (!donorSnap.empty) {
+          donors = donorSnap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+        }
+
+        const tourSnap = await getDocs(collection(db, "tourism"));
+        if (!tourSnap.empty) {
+          tourismData = tourSnap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+        }
+
+        const hotSnap = await getDocs(collection(db, "hotlines"));
+        if (!hotSnap.empty) {
+          hotlines = hotSnap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+        }
+
+        const jobSnap = await getDocs(collection(db, "jobs"));
+        if (!jobSnap.empty) {
+          jobs = jobSnap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+        }
+
+        const userSnap = await getDocs(collection(db, "users"));
+        if (!userSnap.empty) {
+          users = userSnap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+        }
+
+        saveAllDataLocally();
+        renderSchools();
+        renderHospitals();
+        renderBloodDonors();
+        renderTourism();
+        renderHotlines();
+        renderJobs();
+      } catch (err) {
+        console.log("Cloud load fallback:", err);
+        renderSchools();
+        renderHospitals();
+        renderBloodDonors();
+        renderTourism();
+        renderHotlines();
+        renderJobs();
+      }
+    }
+
+    function loadAnnouncement() {
+      const savedNotice = localStorage.getItem('hatia_announcement_text');
+      if (savedNotice) {
+        document.getElementById('announcementText').innerText = savedNotice;
+      }
+    }
+
+    function openAnnouncementModal() {
+      if (!currentUser || !currentUser.isAdmin) return;
+      const currentText = document.getElementById('announcementText').innerText;
+      document.getElementById('noticeInputText').value = currentText;
+      document.getElementById('announcementModal').classList.remove('hidden');
+    }
+
+    function closeAnnouncementModal() {
+      document.getElementById('announcementModal').classList.add('hidden');
+    }
+
+    function openNoticeModal() {
+      const currentText = document.getElementById('announcementText').innerText;
+      document.getElementById('fullNoticeContent').innerText = currentText;
+      document.getElementById('noticeModal').classList.remove('hidden');
+    }
+
+    function closeNoticeModal() {
+      document.getElementById('noticeModal').classList.add('hidden');
+    }
+
+    function handleAnnouncementSubmit(e) {
+      e.preventDefault();
+      if (!currentUser || !currentUser.isAdmin) { showAlert('অনুমতি নেই!', 'error'); return; }
+      const newText = document.getElementById('noticeInputText').value.trim();
+      if (newText) {
+        localStorage.setItem('hatia_announcement_text', newText);
+        document.getElementById('announcementText').innerText = newText;
+        showAlert('জরুরি ঘোষণা আপডেট করা হয়েছে!', 'success');
+        closeAnnouncementModal();
+      }
+    }
+
+    function openQrModal() {
+      const currentUrl = window.location.href;
+      document.getElementById('qrCodeImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentUrl)}`;
+      document.getElementById('qrModal').classList.remove('hidden');
+    }
+    function closeQrModal() {
+      document.getElementById('qrModal').classList.add('hidden');
+    }
+
+    function trackPageView() {
+        let isAdmin = localStorage.getItem('is_admin_logged_in') === 'true';
+        if (isAdmin) return;
+        if (!sessionStorage.getItem('session_counted')) {
+            let views = parseInt(localStorage.getItem('site_total_views') || 0);
+            views++;
+            localStorage.setItem('site_total_views', views);
+            sessionStorage.setItem('session_counted', 'true');
+        }
+    }
+
+    function trackLoginUser(phone, isAdmin = false) {
+        if (isAdmin) return;
+        let loginList = JSON.parse(localStorage.getItem('site_login_users') || '[]');
+        if (!loginList.includes(phone)) {
+            loginList.push(phone);
+            localStorage.setItem('site_login_users', JSON.stringify(loginList));
+        }
+    }
+
+    function updateStatsDisplay() {
+        if(document.getElementById('totalViewsDisplay')) {
+            document.getElementById('totalViewsDisplay').innerText = localStorage.getItem('site_total_views') || 0;
+        }
+        if(document.getElementById('totalLoginsDisplay')) {
+            let registeredLogins = JSON.parse(localStorage.getItem('site_login_users') || '[]');
+            document.getElementById('totalLoginsDisplay').innerText = registeredLogins.length;
+        }
+    }
+
+    function backupData() {
+        const backupObj = {
+            schools,
+            hospitals,
+            donors,
+            tourismData,
+            hotlines,
+            jobs,
+            users,
+            favorites,
+            announcement: localStorage.getItem('hatia_announcement_text') || ''
+        };
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `Hatia_Directory_Backup_${new Date().toISOString().slice(0,10)}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+        showAlert('ব্যাকআপ ফাইল সফলভাবে ডাউনলোড হয়েছে!', 'success');
+    }
+
+    function restoreData() {
+        if (!currentUser || !currentUser.isAdmin) {
+            showAlert('শুধুমাত্র এডমিন ব্যাকআপ রিস্টোর করতে পারবেন!', 'error');
+            return;
+        }
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.json';
+        fileInput.onchange = e => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async event => {
+                try {
+                    const parsed = JSON.parse(event.target.result);
+                    if (parsed.schools) schools = parsed.schools;
+                    if (parsed.hospitals) hospitals = parsed.hospitals;
+                    if (parsed.donors) donors = parsed.donors;
+                    if (parsed.tourismData) tourismData = parsed.tourismData;
+                    if (parsed.hotlines) hotlines = parsed.hotlines;
+                    if (parsed.jobs) jobs = parsed.jobs;
+                    if (parsed.users) users = parsed.users;
+                    if (parsed.favorites) favorites = parsed.favorites;
+                    if (parsed.announcement) {
+                        localStorage.setItem('hatia_announcement_text', parsed.announcement);
+                        loadAnnouncement();
+                    }
+                    
+                    saveAllDataLocally();
+                    renderSchools();
+                    renderHospitals();
+                    renderBloodDonors();
+                    renderTourism();
+                    renderHotlines();
+                    renderJobs();
+                    showAlert('ডাটা সফলভাবে রিস্টোর করা হয়েছে!', 'success');
+                } catch (err) {
+                    showAlert('সঠিক ব্যাকআপ ফাইল নির্বাচন করুন!', 'error');
+                }
+            };
+            reader.readAsText(file);
+        };
+        fileInput.click();
+    }
+
+    const VALID_HATIA_AREAS = ["হাতিয়া পৌরসভা", "তমরদ্দি", "বুড়িরচর", "জাহাজমারা", "চরঈশ্বর", "চরকিং", "সুখচর", "নলচিরা", "সোনারচর"];
+    
+    const initialDemoSchools = [
+      {
+        id: 'SCH_DEMO_1',
+        name: 'হাতিয়া সরকারি পাইলট মডেল উচ্চ বিদ্যালয়',
+        code: '106123',
+        type: 'স্কুল',
+        location: 'হাতিয়া পৌরসভা',
+        address: 'ওছখালী বাজার রোড',
+        head: 'মোঃ রফিকুল ইসলাম (01711000000)',
+        addedBy: 'Admin (01782727709)',
+        students: [
+          { class: '৬ষ্ঠ শ্রেণি', boys: 65, girls: 70 },
+          { class: '৭ম শ্রেণি', boys: 60, girls: 65 }, 
+          { class: '৮ম শ্রেণি', boys: 55, girls: 60 }
+        ],
+        teachers: [
+          { name: 'আব্দুর রহমান', role: 'প্রধান শিক্ষক', phone: '01711223344', address: 'ওছখালী' }
+        ]
+      }
+    ];
+
+    const initialHospitals = [
+      { id: 'HSP_1', name: 'হাতিয়া উপজেলা স্বাস্থ্য কমপ্লেক্স', type: 'সরকারি হাসপাতাল', address: 'ওছখালী, হাতিয়া', details: 'সরকারি সাধারণ হাসপাতাল, জরুরি সেবা ও অ্যাম্বুলেন্স উপলব্ধ।', phone: '01700000000', addedBy: 'Admin (01782727709)' }
+    ];
+
+    const initialDonors = [
+      { id: 'DON_1', name: 'মোহাম্মদ আরাবী', group: 'A+', phone: '01782727709', count: 5, photo: '', lastDate: '2026-01-15', addedBy: 'Admin (01782727709)', addedByPhone: '01782727709' }
+    ];
+
+    const initialTourism = [
+      { id: 'TR_1', title: 'আবদুল হান্নান মাসউদ', category: 'পরিচিতি', designation: 'মাননীয় সংসদ সদস্য (নোয়াখালী-৬)', desc: 'হাতিয়া উপজেলার সার্বিক শিক্ষা ও সামাজিক উন্নয়নে প্রতিশ্রুতিবদ্ধ।', addedBy: 'Admin (01782727709)' },
+      { id: 'TR_2', title: 'নিঝুম দ্বীপ', category: 'পর্যটন', designation: '', desc: 'চিত্রা হরিণের অভয়ারণ্য ও বঙ্গোপসাগরের কোলে অবস্থিত ম্যানগ্রোভ বনাঞ্চল।', addedBy: 'Admin (01782727709)' },
+      { id: 'TR_3', title: 'মহিষের দই ও ঘি', category: 'খাবার', designation: '', desc: 'হাতিয়ার ঐতিহ্যবাহী খাঁটি মহিষের দুধের ঘন দই ও ঘি।', addedBy: 'Admin (01782727709)' }
+    ];
+
+    const initialHotlines = [
+      { id: 'HOT_1', category: 'পুলিশ সেবা', name: 'হাতিয়া থানা ও অফিসার ইনচার্জ', desc: 'ওছখালী, হাতিয়া, নোয়াখালী', phone: '01320111555' },
+      { id: 'HOT_2', category: 'ফায়ার সার্ভিস', name: 'হাতিয়া ফায়ার সার্ভিস স্টেশন', desc: 'জরুরি আগুন ও উদ্ধার সেবা', phone: '01901022333' },
+      { id: 'HOT_3', category: 'বিদ্যুৎ অফিস', name: 'পল্লী বিদ্যুৎ হাতিয়া জোনাল অফিস', desc: 'বিদ্যুৎ সংক্রান্ত অভিযোগ ও সেবা', phone: '01711000000' }
+    ];
+
+    const initialJobs = [
+      { id: 'JOB_1', title: 'সহকারী শিক্ষক (গণিত)', org: 'হাতিয়া মডেল হাই স্কুল', deadline: '২০২৬-১১-৩০', desc: 'স্নাতক পাস প্রার্থীরা আবেদন করতে পারবেন। যোগাযোগ: স্কুলে সরাসরি সিভি জমা দিন।' }
+    ];
+
+    let currentUser = JSON.parse(localStorage.getItem('hatia_logged_user')) || null;
+    let schools = initialDemoSchools;
+    let hospitals = initialHospitals;
+    let donors = initialDonors;
+    let tourismData = initialTourism;
+    let hotlines = initialHotlines;
+    let jobs = initialJobs;
+    let favorites = JSON.parse(localStorage.getItem('hatia_favorites_list')) || [];
+    let users = JSON.parse(localStorage.getItem('hatia_users_data')) || [];
+    let userAuthMode = 'login'; 
+    let showOnlyEligibleDonors = false;
+
+    const ADMIN_PHONE = "01782727709";
+    const ADMIN_PASS = "asmarabee";
+
+    function switchTab(tab) {
+      document.getElementById('directoryTab').classList.add('hidden');
+      document.getElementById('hospitalTab').classList.add('hidden');
+      document.getElementById('bloodDonationTab').classList.add('hidden');
+      document.getElementById('aboutHatiaTab').classList.add('hidden');
+      document.getElementById('jobCircularTab').classList.add('hidden');
+      document.getElementById('emergencyHotlineTab').classList.add('hidden');
+      document.getElementById('favoritesTab').classList.add('hidden');
+      if(document.getElementById('schoolDetailTab')) document.getElementById('schoolDetailTab').classList.add('hidden');
+
+      document.getElementById('tabBtnDirectory').className = "py-3 px-4 font-semibold text-slate-600 dark:text-slate-300 border-b-2 border-transparent hover:text-emerald-600 flex items-center gap-2 whitespace-nowrap";
+      document.getElementById('tabBtnHospital').className = "py-3 px-4 font-semibold text-slate-600 dark:text-slate-300 border-b-2 border-transparent hover:text-emerald-600 flex items-center gap-2 whitespace-nowrap";
+      document.getElementById('tabBtnBlood').className = "py-3 px-4 font-semibold text-slate-600 dark:text-slate-300 border-b-2 border-transparent hover:text-emerald-600 flex items-center gap-2 whitespace-nowrap";
+      document.getElementById('tabBtnAboutHatia').className = "py-3 px-4 font-semibold text-slate-600 dark:text-slate-300 border-b-2 border-transparent hover:text-emerald-600 flex items-center gap-2 whitespace-nowrap";
+      document.getElementById('tabBtnJob').className = "py-3 px-4 font-semibold text-slate-600 dark:text-slate-300 border-b-2 border-transparent hover:text-emerald-600 flex items-center gap-2 whitespace-nowrap";
+      document.getElementById('tabBtnHotline').className = "py-3 px-4 font-semibold text-slate-600 dark:text-slate-300 border-b-2 border-transparent hover:text-emerald-600 flex items-center gap-2 whitespace-nowrap";
+      document.getElementById('tabBtnFavorites').className = "py-3 px-4 font-semibold text-slate-600 dark:text-slate-300 border-b-2 border-transparent hover:text-red-500 flex items-center gap-2 whitespace-nowrap";
+
+      if (tab === 'directory') {
+          document.getElementById('directoryTab').classList.remove('hidden');
+          document.getElementById('tabBtnDirectory').className = "py-3 px-4 font-semibold text-emerald-700 dark:text-emerald-400 border-b-2 border-emerald-600 flex items-center gap-2 whitespace-nowrap";
+          renderSchools();
+      } else if (tab === 'hospital') {
+          document.getElementById('hospitalTab').classList.remove('hidden');
+          document.getElementById('tabBtnHospital').className = "py-3 px-4 font-semibold text-emerald-700 dark:text-emerald-400 border-b-2 border-emerald-600 flex items-center gap-2 whitespace-nowrap";
+          renderHospitals();
+      } else if (tab === 'bloodDonation') {
+          document.getElementById('bloodDonationTab').classList.remove('hidden');
+          document.getElementById('tabBtnBlood').className = "py-3 px-4 font-semibold text-emerald-700 dark:text-emerald-400 border-b-2 border-emerald-600 flex items-center gap-2 whitespace-nowrap";
+          renderBloodDonors();
+      } else if (tab === 'aboutHatia') {
+          document.getElementById('aboutHatiaTab').classList.remove('hidden');
+          document.getElementById('tabBtnAboutHatia').className = "py-3 px-4 font-semibold text-emerald-700 dark:text-emerald-400 border-b-2 border-emerald-600 flex items-center gap-2 whitespace-nowrap";
+          renderTourism();
+      } else if (tab === 'jobCircular') {
+          document.getElementById('jobCircularTab').classList.remove('hidden');
+          document.getElementById('tabBtnJob').className = "py-3 px-4 font-semibold text-emerald-700 dark:text-emerald-400 border-b-2 border-emerald-600 flex items-center gap-2 whitespace-nowrap";
+          renderJobs();
+      } else if (tab === 'emergencyHotline') {
+          document.getElementById('emergencyHotlineTab').classList.remove('hidden');
+          document.getElementById('tabBtnHotline').className = "py-3 px-4 font-semibold text-emerald-700 dark:text-emerald-400 border-b-2 border-emerald-600 flex items-center gap-2 whitespace-nowrap";
+          renderHotlines();
+      } else if (tab === 'favorites') {
+          document.getElementById('favoritesTab').classList.remove('hidden');
+          document.getElementById('tabBtnFavorites').className = "py-3 px-4 font-semibold text-red-500 border-b-2 border-red-500 flex items-center gap-2 whitespace-nowrap";
+          renderFavorites();
+      } else if (tab === 'schoolDetail') {
+          document.getElementById('schoolDetailTab').classList.remove('hidden');
+      }
+      // sessionStorage-এ সক্রিয় ট্যাবটি সেভ করে রাখা হচ্ছে যাতে রিফ্রেশ বা সেভ করার পর সেখানেই থাকে
+      sessionStorage.setItem('active_hatia_tab', tab);
+    }
+
+    function toggleFavorite(id) {
+      if (favorites.includes(id)) {
+        favorites = favorites.filter(item => item !== id);
+        showAlert('ফেভারিট বা বুকমার্ক থেকে সরানো হয়েছে!', 'info');
+      } else {
+        favorites.push(id);
+        showAlert('আপনার ফেভারিট লিস্টে যোগ করা হয়েছে! ❤️', 'success');
+      }
+      localStorage.setItem('hatia_favorites_list', JSON.stringify(favorites));
+      saveAllDataLocally();
+      renderSchools();
+      renderHospitals();
+      renderBloodDonors();
+      renderHotlines();
+      if (!document.getElementById('favoritesTab').classList.contains('hidden')) {
+        renderFavorites();
+      }
+    }
+
+    function renderFavorites() {
+      const container = document.getElementById('favoritesListContainer');
+      if (favorites.length === 0) {
+        container.innerHTML = `<div class="col-span-3 text-center text-slate-500 p-8">আপনার ফেভারিট বা বুকমার্ক লিস্টে কোনো তথ্য নেই।</div>`;
+        return;
+      }
+
+      let html = '';
+      schools.filter(s => favorites.includes(s.id)).forEach(s => {
+        html += `
+          <div class="bg-white dark:bg-slate-700 rounded-xl shadow-sm border dark:border-slate-600 p-4 space-y-3 relative border-t-4 border-t-blue-500">
+            <button onclick="toggleFavorite('${s.id}')" class="absolute right-3 top-3 text-red-500"><i class="fa-solid fa-heart"></i></button>
+            <span class="px-2.5 py-0.5 text-xs font-bold rounded bg-blue-100 text-blue-800">${s.type}</span>
+            <h3 class="font-bold text-base cursor-pointer hover:text-emerald-600" onclick="viewSchoolDetail('${s.id}')">${s.name}</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-300">এলাকা: ${s.location}</p>
+            <button onclick="viewSchoolDetail('${s.id}')" class="w-full mt-2 py-1.5 bg-emerald-600 text-white rounded text-xs font-semibold">বিস্তারিত দেখুন</button>
+          </div>
+        `;
+      });
+
+      hospitals.filter(h => favorites.includes(h.id)).forEach(h => {
+        html += `
+          <div class="bg-white dark:bg-slate-700 rounded-xl shadow-sm border dark:border-slate-600 p-4 space-y-3 relative border-t-4 border-t-emerald-500">
+            <button onclick="toggleFavorite('${h.id}')" class="absolute right-3 top-3 text-red-500"><i class="fa-solid fa-heart"></i></button>
+            <span class="px-2.5 py-0.5 text-xs font-bold rounded bg-emerald-100 text-emerald-800">${h.type}</span>
+            <h3 class="font-bold text-base">${h.name}</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-300">${h.address}</p>
+            <a href="tel:${h.phone}" class="block text-center w-full mt-2 py-1.5 bg-slate-800 text-white rounded text-xs font-semibold"><i class="fa-solid fa-phone"></i> ${h.phone}</a>
+          </div>
+        `;
+      });
+
+      donors.filter(d => favorites.includes(d.id)).forEach(d => {
+        html += `
+          <div class="bg-white dark:bg-slate-700 rounded-xl shadow-sm border dark:border-slate-600 p-4 space-y-3 relative border-t-4 border-t-red-500">
+            <button onclick="toggleFavorite('${d.id}')" class="absolute right-3 top-3 text-red-500"><i class="fa-solid fa-heart"></i></button>
+            <span class="px-2.5 py-0.5 text-xs font-bold rounded bg-red-100 text-red-800">রক্তের গ্রুপ: ${d.group}</span>
+            <h3 class="font-bold text-base">${d.name}</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-300">দান: ${d.count || 1} বার</p>
+            <a href="tel:${d.phone}" class="block text-center w-full mt-2 py-1.5 bg-red-600 text-white rounded text-xs font-semibold"><i class="fa-solid fa-phone"></i> ${d.phone}</a>
+          </div>
+        `;
+      });
+
+      hotlines.filter(hl => favorites.includes(hl.id)).forEach(hl => {
+        html += `
+          <div class="bg-white dark:bg-slate-700 rounded-xl shadow-sm border dark:border-slate-600 p-4 space-y-3 relative border-t-4 border-t-amber-500">
+            <button onclick="toggleFavorite('${hl.id}')" class="absolute right-3 top-3 text-red-500"><i class="fa-solid fa-heart"></i></button>
+            <span class="px-2.5 py-0.5 text-xs font-bold rounded bg-amber-100 text-amber-800">${hl.category}</span>
+            <h3 class="font-bold text-base">${hl.name}</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-300">${hl.desc}</p>
+            <a href="tel:${hl.phone}" class="block text-center w-full mt-2 py-1.5 bg-slate-800 text-white rounded text-xs font-semibold"><i class="fa-solid fa-phone"></i> ${hl.phone}</a>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    const availableClassLevels = [
+      "১ম শ্রেণি", "২য় শ্রেণি", "৩য় শ্রেণি", "৪র্থ শ্রেণি", "৫ম শ্রেণি",
+      "৬ষ্ঠ শ্রেণি", "৭ম শ্রেণি", "৮ম শ্রেণি", "৯ম শ্রেণি", "১০ম শ্রেণি",
+      "একাদশ শ্রেণি", "দ্বাদশ শ্রেণি", "ডিগ্রি", "অনার্স", 
+      "ফাজিল", "কামিল", "মাস্টার্স", "উন্মুক্ত"
+    ];
+
+    function addClassRow(clsName = "", boys = 0, girls = 0) {
+      const container = document.getElementById('classRowsContainer');
+      const rowId = 'class_row_' + Date.now() + Math.random().toString(36).substring(2, 5);
+      let options = `<option value="">শ্রেণি নির্বাচন করুন</option>`;
+      availableClassLevels.forEach(c => {
+        let sel = (c === clsName) ? 'selected' : '';
+        options += `<option value="${c}" ${sel}>${c}</option>`;
+      });
+
+      const div = document.createElement('div');
+      div.id = rowId;
+      div.className = "flex flex-col sm:flex-row items-center gap-2 bg-white dark:bg-slate-800 p-2 rounded border dark:border-slate-600 text-xs";
+      div.innerHTML = `
+        <div class="w-full sm:w-1/2"><select class="classNameSelect w-full border dark:border-slate-600 rounded p-1.5 bg-white dark:bg-slate-700 outline-none">${options}</select></div>
+        <div class="w-full sm:w-1/4 flex items-center gap-1"><span class="text-slate-500">ছাত্র:</span><input type="number" min="0" value="${boys}" class="classBoysInput w-full border dark:border-slate-600 rounded p-1 text-center bg-transparent"></div>
+        <div class="w-full sm:w-1/4 flex items-center gap-1"><span class="text-slate-500">ছাত্রী:</span><input type="number" min="0" value="${girls}" class="classGirlsInput w-full border dark:border-slate-600 rounded p-1 text-center bg-transparent"><button type="button" onclick="document.getElementById('${rowId}').remove()" class="text-red-500 ml-1"><i class="fa-solid fa-trash"></i></button></div>
+      `;
+      container.appendChild(div);
+    }
+
+    function renderClassRows() {
+      const container = document.getElementById('classRowsContainer');
+      container.innerHTML = '';
+      addClassRow("৬ষ্ঠ শ্রেণি", 0, 0);
+      addClassRow("৭ম শ্রেণি", 0, 0);
+      addClassRow("৮ম শ্রেণি", 0, 0);
+    }
+
+    let teachersCount = 0;
+    function addTeacherRow(name = '', role = '', phone = '', address = '') {
+      teachersCount++;
+      const container = document.getElementById('teachersContainer');
+      const div = document.createElement('div');
+      div.id = `teacherRow_${teachersCount}`;
+      div.className = "grid grid-cols-1 sm:grid-cols-4 gap-2 bg-white dark:bg-slate-800 p-2 rounded border dark:border-slate-600 text-xs relative pr-8";
+      div.innerHTML = `
+        <input type="text" placeholder="শিক্ষকের নাম" value="${name}" class="t-name border dark:border-slate-600 rounded p-1 bg-transparent">
+        <input type="text" placeholder="পদবি" value="${role}" class="t-role border dark:border-slate-600 rounded p-1 bg-transparent">
+        <input type="tel" placeholder="মোবাইল" value="${phone}" class="t-phone border dark:border-slate-600 rounded p-1 bg-transparent">
+        <input type="text" placeholder="ঠিকানা" value="${address}" class="t-address border dark:border-slate-600 rounded p-1 bg-transparent">
+        <button type="button" onclick="document.getElementById('teacherRow_${teachersCount}').remove()" class="absolute right-2 top-2.5 text-red-500"><i class="fa-solid fa-trash"></i></button>
+      `;
+      container.appendChild(div);
+    }
+
+    function openAddSchoolModal(id = '') {
+      document.getElementById('addSchoolModal').classList.remove('hidden');
+      const title = document.getElementById('schoolModalTitle');
+      if (id) {
+        if (!currentUser || !currentUser.isAdmin) { showAlert('শুধুমাত্র এডমিন এডিট করতে পারবেন!', 'error'); closeAddSchoolModal(); return; }
+        title.innerText = 'শিক্ষা প্রতিষ্ঠানের তথ্য এডিট করুন';
+        const s = schools.find(item => item.id === id);
+        if (s) {
+          document.getElementById('editingSchoolId').value = s.id;
+          document.getElementById('schoolName').value = s.name;
+          document.getElementById('schoolCode').value = s.code;
+          document.getElementById('schoolType').value = s.type;
+          document.getElementById('schoolLocation').value = s.location;
+          document.getElementById('schoolAddress').value = s.address;
+          document.getElementById('headDetails').value = s.head || '';
+          const container = document.getElementById('classRowsContainer');
+          container.innerHTML = '';
+          if (s.students) s.students.forEach(st => addClassRow(st.class, st.boys, st.girls));
+          else addClassRow();
+          const tContainer = document.getElementById('teachersContainer');
+          tContainer.innerHTML = '';
+          if (s.teachers) s.teachers.forEach(t => addTeacherRow(t.name, t.role, t.phone, t.address));
+          else addTeacherRow();
+        }
+      } else {
+        title.innerText = 'নতুন প্রতিষ্ঠানের তথ্য যুক্ত করুন';
+        document.getElementById('editingSchoolId').value = '';
+        document.getElementById('schoolForm').reset();
+        renderClassRows();
+        document.getElementById('teachersContainer').innerHTML = '';
+        addTeacherRow();
+      }
+    }
+    function closeAddSchoolModal() { document.getElementById('addSchoolModal').classList.add('hidden'); }
+
+    function openHospitalModal(id = '') {
+      document.getElementById('hospitalModal').classList.remove('hidden');
+      const title = document.getElementById('hospitalModalTitle');
+      if (id) {
+        if (!currentUser || !currentUser.isAdmin) { showAlert('শুধুমাত্র এডমিন এডিট করতে পারবেন!', 'error'); closeHospitalModal(); return; }
+        title.innerText = 'হাসপাতাল তথ্য এডিট করুন';
+        const h = hospitals.find(item => item.id === id);
+        if (h) {
+          document.getElementById('editingHospitalId').value = h.id;
+          document.getElementById('hName').value = h.name;
+          document.getElementById('hType').value = h.type;
+          document.getElementById('hAddress').value = h.address;
+          document.getElementById('hDetails').value = h.details || '';
+          document.getElementById('hPhone').value = h.phone;
+        }
+      } else {
+        title.innerText = 'হাসপাতাল বা স্বাস্থ্যসেবা তথ্য যুক্ত করুন';
+        document.getElementById('editingHospitalId').value = '';
+        document.getElementById('hName').value = '';
+        document.getElementById('hAddress').value = '';
+        document.getElementById('hDetails').value = '';
+        document.getElementById('hPhone').value = '';
+      }
+    }
+    function closeHospitalModal() { document.getElementById('hospitalModal').classList.add('hidden'); }
+
+    function openBloodModal(id = '') {
+      document.getElementById('bloodModal').classList.remove('hidden');
+      const title = document.getElementById('bloodModalTitle');
+      if (id) {
+        const d = donors.find(item => item.id === id);
+        if (d) {
+          if (!currentUser || (!currentUser.isAdmin && d.addedByPhone !== currentUser.phone)) { 
+            showAlert('অনুমতি নেই!', 'error'); closeBloodModal(); return; 
+          }
+          title.innerText = 'ডোনারের তথ্য এডিট করুন';
+          document.getElementById('editingDonorId').value = d.id;
+          document.getElementById('bName').value = d.name;
+          document.getElementById('bGroup').value = d.group;
+          document.getElementById('bPhone').value = d.phone;
+          document.getElementById('bDonateCount').value = d.count || 1;
+          document.getElementById('bLastDate').value = d.lastDate;
+        }
+      } else {
+        title.innerText = 'ডোনার হিসেবে আপনার তথ্য দিন';
+        document.getElementById('editingDonorId').value = '';
+        document.getElementById('bName').value = currentUser ? (currentUser.name || '') : '';
+        document.getElementById('bPhone').value = currentUser ? currentUser.phone : '';
+        document.getElementById('bDonateCount').value = 1;
+        document.getElementById('bPhotoFile').value = '';
+        document.getElementById('bLastDate').value = '';
+      }
+    }
+    function closeBloodModal() { document.getElementById('bloodModal').classList.add('hidden'); }
+
+    function openHotlineModal(id = '') {
+      if (!currentUser || !currentUser.isAdmin) { showAlert('শুধুমাত্র এডমিন হটলাইন যুক্ত বা এডিট করতে পারবেন!', 'error'); return; }
+      document.getElementById('hotlineModal').classList.remove('hidden');
+      const title = document.getElementById('hotlineModalTitle');
+      if (id) {
+        title.innerText = 'হটলাইন তথ্য এডিট করুন';
+        const item = hotlines.find(h => h.id === id);
+        if (item) {
+          document.getElementById('editingHotlineId').value = item.id;
+          document.getElementById('hotlineCategory').value = item.category;
+          document.getElementById('hotlineName').value = item.name;
+          document.getElementById('hotlineDesc').value = item.desc;
+          document.getElementById('hotlinePhone').value = item.phone;
+        }
+      } else {
+        title.innerText = 'নতুন জরুরি হটলাইন যোগ করুন';
+        document.getElementById('editingHotlineId').value = '';
+        document.getElementById('hotlineCategory').value = '';
+        document.getElementById('hotlineName').value = '';
+        document.getElementById('hotlineDesc').value = '';
+        document.getElementById('hotlinePhone').value = '';
+      }
+    }
+    function closeHotlineModal() { document.getElementById('hotlineModal').classList.add('hidden'); }
+
+    async function handleHotlineSubmit(e) {
+      e.preventDefault();
+      if (!currentUser || !currentUser.isAdmin) { showAlert('অনুমতি নেই!', 'error'); return; }
+      const editingId = document.getElementById('editingHotlineId').value;
+      const category = document.getElementById('hotlineCategory').value.trim();
+      const name = document.getElementById('hotlineName').value.trim();
+      const desc = document.getElementById('hotlineDesc').value.trim();
+      const phone = document.getElementById('hotlinePhone').value.trim();
+
+      closeHotlineModal();
+
+      if (editingId) {
+        const idx = hotlines.findIndex(h => h.id === editingId);
+        if (idx !== -1) {
+          hotlines[idx] = { ...hotlines[idx], category, name, desc, phone };
+          saveAllDataLocally();
+          renderHotlines();
+          showAlert('হটলাইন সফলভাবে আপডেট হয়েছে!', 'success');
+          setDoc(doc(db, "hotlines", editingId), hotlines[idx]).catch(err => console.log(err));
+        }
+      } else {
+        const newObj = { id: 'HOT_' + Date.now(), category, name, desc, phone };
+        hotlines.push(newObj);
+        saveAllDataLocally();
+        renderHotlines();
+        showAlert('নতুন হটলাইন সফলভাবে যুক্ত হয়েছে!', 'success');
+        setDoc(doc(db, "hotlines", newObj.id), newObj).catch(err => console.log(err));
+      }
+    }
+
+    async function deleteHotline(id) {
+      if (!currentUser || !currentUser.isAdmin) { showAlert('শুধুমাত্র এডমিন ডিলিট করতে পারবেন!', 'error'); return; }
+      if (confirm('নিশ্চিত হটলাইনটি ডিলিট করতে চান?')) {
+        hotlines = hotlines.filter(h => h.id !== id);
+        saveAllDataLocally();
+        renderHotlines();
+        showAlert('হটলাইন ডিলিট করা হয়েছে!', 'info');
+        deleteDoc(doc(db, "hotlines", id)).catch(err => console.log(err));
+      }
+    }
+
+    function renderHotlines() {
+      const container = document.getElementById('hotlineContainer');
+      const addBtn = document.getElementById('addHotlineBtn');
+      if (currentUser && currentUser.isAdmin) {
+        addBtn.classList.remove('hidden');
+      } else {
+        addBtn.classList.add('hidden');
+      }
+
+      if (hotlines.length === 0) {
+        container.innerHTML = `<div class="col-span-3 text-center text-slate-500 p-8">কোনো হটলাইন নম্বর পাওয়া যায়নি।</div>`;
+        return;
+      }
+
+      container.innerHTML = hotlines.map(h => {
+        const isFav = favorites.includes(h.id);
+        return `
+          <div class="p-4 border dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-700 shadow-sm space-y-2 relative">
+            <div class="flex justify-between items-start">
+              <span class="px-2.5 py-0.5 text-xs font-bold rounded bg-red-100 text-red-800">${h.category}</span>
+              <div class="flex items-center gap-2">
+                <button onclick="toggleFavorite('${h.id}')" class="text-sm ${isFav ? 'text-red-500' : 'text-slate-400 hover:text-red-500'}" title="ফেভারিট করুন"><i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i></button>
+                ${currentUser && currentUser.isAdmin ? `
+                  <button onclick="openHotlineModal('${h.id}')" class="text-amber-600 text-xs bg-amber-50 px-2 py-1 rounded font-bold" title="এডিট"><i class="fa-solid fa-pen-to-square"></i></button>
+                  <button onclick="deleteHotline('${h.id}')" class="text-red-500 text-xs bg-red-50 px-2 py-1 rounded font-bold" title="ডিলিট"><i class="fa-solid fa-trash"></i></button>
+                ` : ''}
+              </div>
+            </div>
+            <h3 class="font-bold text-base text-slate-800 dark:text-slate-100">${h.name}</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300">${h.desc}</p>
+            <div class="pt-2 border-t dark:border-slate-600 flex justify-between items-center text-xs">
+              <span class="font-bold text-red-600 dark:text-red-400">হটলাইন:</span>
+              <a href="tel:${h.phone}" class="bg-slate-800 dark:bg-slate-900 text-white px-3 py-1 rounded font-bold shadow hover:bg-slate-700"><i class="fa-solid fa-phone mr-1"></i> ${h.phone}</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openJobModal(id = '') {
+      if (!currentUser || !currentUser.isAdmin) { showAlert('শুধুমাত্র এডমিন চাকরির সার্কুলার যুক্ত বা এডিট করতে পারবেন!', 'error'); return; }
+      document.getElementById('jobModal').classList.remove('hidden');
+      const title = document.getElementById('jobModalTitle');
+      if (id) {
+        title.innerText = 'সার্কুলার এডিট করুন';
+        const item = jobs.find(j => j.id === id);
+        if (item) {
+          document.getElementById('editingJobId').value = item.id;
+          document.getElementById('jobTitle').value = item.title;
+          document.getElementById('jobOrg').value = item.org;
+          document.getElementById('jobDeadline').value = item.deadline;
+          document.getElementById('jobDesc').value = item.desc;
+        }
+      } else {
+        title.innerText = 'নতুন চাকরির সার্কুলার যোগ করুন';
+        document.getElementById('editingJobId').value = '';
+        document.getElementById('jobTitle').value = '';
+        document.getElementById('jobOrg').value = '';
+        document.getElementById('jobDeadline').value = '';
+        document.getElementById('jobDesc').value = '';
+      }
+    }
+    function closeJobModal() { document.getElementById('jobModal').classList.add('hidden'); }
+
+    async function handleJobSubmit(e) {
+      e.preventDefault();
+      if (!currentUser || !currentUser.isAdmin) { showAlert('অনুমতি নেই!', 'error'); return; }
+      const editingId = document.getElementById('editingJobId').value;
+      const title = document.getElementById('jobTitle').value.trim();
+      const org = document.getElementById('jobOrg').value.trim();
+      const deadline = document.getElementById('jobDeadline').value;
+      const desc = document.getElementById('jobDesc').value.trim();
+
+      closeJobModal();
+
+      if (editingId) {
+        const idx = jobs.findIndex(j => j.id === editingId);
+        if (idx !== -1) {
+          jobs[idx] = { ...jobs[idx], title, org, deadline, desc };
+          saveAllDataLocally();
+          renderJobs();
+          showAlert('সার্কুলার আপডেট হয়েছে!', 'success');
+          setDoc(doc(db, "jobs", editingId), jobs[idx]).catch(err => console.log(err));
+        }
+      } else {
+        const newObj = { id: 'JOB_' + Date.now(), title, org, deadline, desc };
+        jobs.push(newObj);
+        saveAllDataLocally();
+        renderJobs();
+        showAlert('নতুন সার্কুলার সফলভাবে যুক্ত হয়েছে!', 'success');
+        setDoc(doc(db, "jobs", newObj.id), newObj).catch(err => console.log(err));
+      }
+    }
+
+    async function deleteJob(id) {
+      if (!currentUser || !currentUser.isAdmin) { showAlert('শুধুমাত্র এডমিন ডিলিট করতে পারবেন!', 'error'); return; }
+      if (confirm('নিশ্চিত সার্কুলারটি ডিলিট করতে চান?')) {
+        jobs = jobs.filter(j => j.id !== id);
+        saveAllDataLocally();
+        renderJobs();
+        showAlert('সার্কুলার ডিলিট হয়েছে!', 'info');
+        deleteDoc(doc(db, "jobs", id)).catch(err => console.log(err));
+      }
+    }
+
+    function renderJobs() {
+      const container = document.getElementById('jobContainer');
+      const addBtn = document.getElementById('addJobBtn');
+      if (currentUser && currentUser.isAdmin) {
+        addBtn.classList.remove('hidden');
+      } else {
+        addBtn.classList.add('hidden');
+      }
+
+      if (jobs.length === 0) {
+        container.innerHTML = `<div class="col-span-3 text-center text-slate-500 p-8">বর্তমানে কোনো চাকরির সার্কুলার নেই।</div>`;
+        return;
+      }
+
+      container.innerHTML = jobs.map(j => `
+        <div class="p-4 border dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-700 shadow-sm space-y-3 relative border-t-4 border-teal-500">
+          <div class="flex justify-between items-start">
+            <span class="px-2.5 py-0.5 text-xs font-bold rounded bg-teal-100 text-teal-800">জব সার্কুলার</span>
+            <div class="flex items-center gap-2">
+              ${currentUser && currentUser.isAdmin ? `
+                <button onclick="openJobModal('${j.id}')" class="text-amber-600 text-xs bg-amber-50 px-2 py-1 rounded font-bold" title="এডিট"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button onclick="deleteJob('${j.id}')" class="text-red-500 text-xs bg-red-50 px-2 py-1 rounded font-bold" title="ডিলিট"><i class="fa-solid fa-trash"></i></button>
+              ` : ''}
+            </div>
+          </div>
+          <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100">${j.title}</h3>
+          <p class="text-xs font-semibold text-teal-700 dark:text-teal-300"><i class="fa-solid fa-building mr-1"></i> ${j.org}</p>
+          <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed bg-white dark:bg-slate-800 p-2.5 rounded border dark:border-slate-600">${j.desc}</p>
+          <div class="pt-2 border-t dark:border-slate-600 flex justify-between items-center text-xs">
+            <span class="text-red-500 font-semibold"><i class="fa-solid fa-clock mr-1"></i> শেষ তারিখ: ${new Date(j.deadline).toLocaleDateString('bn-BD')}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function zoomImage(src) {
+      if(!src) return;
+      document.getElementById('zoomedImage').src = src;
+      document.getElementById('imageZoomModal').classList.remove('hidden');
+    }
+    function closeImageZoom() { document.getElementById('imageZoomModal').classList.add('hidden'); }
+    function closeViewDetailModal() { document.getElementById('viewDetailModal').classList.add('hidden'); }
+
+    function viewHospitalDetail(id) {
+      const h = hospitals.find(item => item.id === id);
+      if(!h) return;
+      const shareUrl = window.location.href;
+      const shareText = encodeURIComponent(`হাসপাতাল: ${h.name}\nঠিকানা: ${h.address}\nহটলাইন: ${h.phone}`);
+      const content = document.getElementById('viewDetailModalContent');
+      content.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex items-center justify-between border-b dark:border-slate-700 pb-2"><span class="px-3 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800">${h.type}</span></div>
+          <h3 class="text-2xl font-bold">${h.name}</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-300"><i class="fa-solid fa-location-dot text-red-500 mr-2"></i>${h.address}</p>
+          <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-xl border dark:border-slate-600 text-sm leading-relaxed"><strong>বিবরণ:</strong> ${h.details || 'তথ্য নেই'}</div>
+          ${currentUser && currentUser.isAdmin ? `<div class="text-xs bg-amber-50 dark:bg-slate-800 p-2 rounded text-amber-800 dark:text-amber-300 border border-amber-200">ℹ️ সংযোজক/এডিটর: ${h.addedBy || 'Admin'}</div>` : ''}
+          <div class="flex items-center gap-2 pt-2">
+            <span class="text-xs font-bold text-slate-500">শেয়ার:</span>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}" target="_blank" class="bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold"><i class="fa-brands fa-facebook"></i> ফেসবুক</a>
+            <a href="https://api.whatsapp.com/send?text=${shareText}" target="_blank" class="bg-emerald-600 text-white px-3 py-1.5 rounded text-xs font-bold"><i class="fa-brands fa-whatsapp"></i> হোয়াটসঅ্যাপ</a>
+          </div>
+          <div class="pt-3 border-t dark:border-slate-700 flex justify-between items-center"><span class="text-xs">জরুরি যোগাযোগ:</span><a href="tel:${h.phone}" class="bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold text-sm"><i class="fa-solid fa-phone"></i> ${h.phone}</a></div>
+        </div>
+      `;
+      document.getElementById('viewDetailModal').classList.remove('hidden');
+    }
+
+    function viewDonorDetail(id) {
+      const d = donors.find(item => item.id === id);
+      if(!d) return;
+      const today = new Date();
+      const nextEligibleDate = new Date(new Date(d.lastDate));
+      nextEligibleDate.setDate(nextEligibleDate.getDate() + 90);
+      const isEligible = today >= nextEligibleDate;
+      const eligibleStr = isEligible ? '<span class="text-emerald-600 font-bold bg-emerald-50 px-3 py-1 rounded">এখনই রক্তদান করতে পারবেন ✅</span>' : `<span class="text-amber-600 font-bold bg-amber-50 px-3 py-1 rounded">পরবর্তী রক্তদান: ${nextEligibleDate.toLocaleDateString('bn-BD')}</span>`;
+      const shareText = encodeURIComponent(`ডোনার: ${d.name}, গ্রুপ: ${d.group}, মোবাইল: ${d.phone}`);
+
+      let photoHtml = `<div class="w-20 h-20 rounded-full bg-red-100 text-red-700 font-bold flex items-center justify-center text-2xl mx-auto">${d.group}</div>`;
+      if(d.photo) photoHtml = `<img src="${d.photo}" class="w-24 h-24 rounded-full object-cover border-4 border-red-500 mx-auto cursor-pointer" onclick="zoomImage('${d.photo}')">`;
+
+      const content = document.getElementById('viewDetailModalContent');
+      content.innerHTML = `
+        <div class="space-y-4 text-center">
+          ${photoHtml}
+          <div><h3 class="text-2xl font-bold">${d.name}</h3><span class="inline-block mt-1 px-3 py-1 bg-red-100 text-red-700 font-bold text-xs rounded-full">গ্রুপ: ${d.group}</span></div>
+          <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-xl border dark:border-slate-600 text-left text-xs space-y-2">
+            <p><strong>মোট দান:</strong> <span class="text-blue-700 dark:text-blue-300 font-bold">${d.count || 1} বার</span></p>
+            <p><strong>সর্বশেষ তারিখ:</strong> ${new Date(d.lastDate).toLocaleDateString('bn-BD')}</p>
+            <div class="pt-2">${eligibleStr}</div>
+            ${currentUser && currentUser.isAdmin ? `<div class="pt-2 border-t dark:border-slate-600 text-amber-700 dark:text-amber-300">ℹ️ সংযোজক: ${d.addedBy || 'Admin'}</div>` : ''}
+          </div>
+          <div class="flex items-center gap-2 pt-1 justify-center"><a href="https://api.whatsapp.com/send?text=${shareText}" target="_blank" class="bg-emerald-600 text-white px-3 py-1.5 rounded text-xs font-bold"><i class="fa-brands fa-whatsapp"></i> হোয়াটসঅ্যাপে শেয়ার</a></div>
+          <div class="pt-2 border-t dark:border-slate-700 flex justify-between items-center text-left"><span class="text-xs">ফোন:</span><a href="tel:${d.phone}" class="bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-xs"><i class="fa-solid fa-phone"></i> ${d.phone}</a></div>
+        </div>
+      `;
+      document.getElementById('viewDetailModal').classList.remove('hidden');
+    }
+
+    function viewTourismDetail(id) {
+      const item = tourismData.find(i => i.id === id);
+      if(!item) return;
+      const shareText = encodeURIComponent(`${item.category}: ${item.title}\n${item.desc}`);
+      const content = document.getElementById('viewDetailModalContent');
+      content.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex items-center justify-between border-b dark:border-slate-700 pb-2"><span class="px-3 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800">${item.category}</span></div>
+          <h3 class="text-2xl font-bold">${item.title}</h3>
+          ${item.designation ? `<p class="text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-slate-700 px-3 py-1.5 rounded-lg inline-block">পদবি: ${item.designation}</p>` : ''}
+          <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-xl border dark:border-slate-600 text-sm leading-relaxed">${item.desc}</div>
+          ${currentUser && currentUser.isAdmin ? `<div class="text-xs bg-amber-50 dark:bg-slate-800 p-2 rounded text-amber-800 dark:text-amber-300 border border-amber-200">ℹ️ সংযোজক: ${item.addedBy || 'Admin'}</div>` : ''}
+          <div class="flex items-center gap-2 pt-2"><a href="https://api.whatsapp.com/send?text=${shareText}" target="_blank" class="bg-emerald-600 text-white px-3 py-1.5 rounded text-xs font-bold"><i class="fa-brands fa-whatsapp"></i> হোয়াটসঅ্যাপ শেয়ার</a></div>
+        </div>
+      `;
+      document.getElementById('viewDetailModal').classList.remove('hidden');
+    }
+
+    function openTourismModal(id = '') {
+      document.getElementById('tourismModal').classList.remove('hidden');
+      const title = document.getElementById('tourismModalTitle');
+      if (id) {
+        if (!currentUser || !currentUser.isAdmin) { showAlert('শুধুমাত্র এডমিন এডিট করতে পারবেন!', 'error'); closeTourismModal(); return; }
+        title.innerText = 'তথ্য এডিট করুন';
+        const item = tourismData.find(i => i.id === id);
+        if (item) {
+          document.getElementById('editingTourismId').value = item.id;
+          document.getElementById('tCategory').value = item.category;
+          document.getElementById('tTitle').value = item.title;
+          document.getElementById('tDesignation').value = item.designation || '';
+          document.getElementById('tDesc').value = item.desc;
+          toggleDesignationField();
+        }
+      } else {
+        title.innerText = 'নতুন তথ্য যোগ করুন';
+        document.getElementById('editingTourismId').value = '';
+        document.getElementById('tTitle').value = '';
+        document.getElementById('tDesignation').value = '';
+        document.getElementById('tDesc').value = '';
+        toggleDesignationField();
+      }
+    }
+    function closeTourismModal() { document.getElementById('tourismModal').classList.add('hidden'); }
+
+    function toggleDesignationField() {
+      const category = document.getElementById('tCategory').value;
+      const wrapper = document.getElementById('designationWrapper');
+      wrapper.style.display = (category === 'পরিচিতি') ? 'block' : 'none';
+      if (category !== 'পরিচিতি') document.getElementById('tDesignation').value = '';
+    }
+
+    function getUserHistoryTag(userObj) {
+      if (!userObj) return 'Admin (01782727709)';
+      if (userObj.isAdmin) return `Admin (${userObj.phone})`;
+      return `${userObj.name || 'User'} (Mob: ${userObj.phone}, NID: ${userObj.nid || 'নেই'})`;
+    }
+
+    async function handleHospitalSubmit(e) {
+      e.preventDefault();
+      const editingId = document.getElementById('editingHospitalId').value;
+      const name = document.getElementById('hName').value.trim();
+      const type = document.getElementById('hType').value;
+      const address = document.getElementById('hAddress').value.trim();
+      const details = document.getElementById('hDetails').value.trim();
+      const phone = document.getElementById('hPhone').value.trim();
+
+      closeHospitalModal();
+
+      if (editingId) {
+        if (!currentUser || !currentUser.isAdmin) { showAlert('অনুমতি নেই!', 'error'); return; }
+        const idx = hospitals.findIndex(h => h.id === editingId);
+        if (idx !== -1) {
+          hospitals[idx] = { ...hospitals[idx], name, type, address, details, phone };
+          saveAllDataLocally();
+          renderHospitals();
+          showAlert('হাসপাতালের তথ্য আপডেট হয়েছে!', 'success');
+          setDoc(doc(db, "hospitals", editingId), hospitals[idx]).catch(err => console.log(err));
+        }
+      } else {
+        if (!currentUser) { showAlert('প্রথমে লগইন করুন!', 'error'); openUserAuthModal(); return; }
+        const newObj = { id: 'HSP_' + Date.now(), name, type, address, details, phone, addedBy: getUserHistoryTag(currentUser) };
+        hospitals.push(newObj);
+        saveAllDataLocally();
+        renderHospitals();
+        showAlert('হাসপাতালের তথ্য যুক্ত হয়েছে!', 'success');
+        setDoc(doc(db, "hospitals", newObj.id), newObj).catch(err => console.log(err));
+      }
+    }
+
+    function renderHospitals() {
+      const container = document.getElementById('hospitalListContainer');
+      if (hospitals.length === 0) { container.innerHTML = `<div class="col-span-3 text-center text-slate-500 p-8">কোনো তথ্য নেই।</div>`; return; }
+      container.innerHTML = hospitals.map(h => {
+        const isFav = favorites.includes(h.id);
+        return `
+          <div class="p-4 border dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-700 shadow-sm space-y-3 relative">
+            <div class="flex justify-between items-start">
+              <span class="px-2.5 py-0.5 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800">${h.type}</span>
+              <div class="flex items-center gap-2">
+                <button onclick="toggleFavorite('${h.id}')" class="text-sm ${isFav ? 'text-red-500' : 'text-slate-400 hover:text-red-500'}"><i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i></button>
+                ${currentUser && currentUser.isAdmin ? `<button onclick="openHospitalModal('${h.id}')" class="text-amber-600 text-xs"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteHospital('${h.id}')" class="text-red-500 text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}
+              </div>
+            </div>
+            <h3 class="font-bold text-lg">${h.name}</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300"><i class="fa-solid fa-location-dot text-red-500 mr-1"></i> ${h.address}</p>
+            <p class="text-xs text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 p-2 rounded border dark:border-slate-600 line-clamp-2">${h.details || ''}</p>
+            ${currentUser && currentUser.isAdmin && h.addedBy ? `<div class="text-[11px] text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-slate-800 p-1.5 rounded">👤 সংযোজক: ${h.addedBy}</div>` : ''}
+            <div class="pt-2 border-t dark:border-slate-600 flex justify-between items-center text-xs">
+              <button onclick="viewHospitalDetail('${h.id}')" class="px-3 py-1.5 bg-emerald-600 text-white font-semibold rounded-lg"><i class="fa-solid fa-eye"></i> বিস্তারিত</button>
+              <a href="tel:${h.phone}" class="bg-slate-800 dark:bg-slate-900 text-white px-3 py-1.5 rounded-lg font-semibold"><i class="fa-solid fa-phone"></i> ${h.phone}</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function deleteHospital(id) {
+      if (!currentUser || !currentUser.isAdmin) { showAlert('শুধুমাত্র এডমিন ডিলিট করতে পারবেন!', 'error'); return; }
+      if (confirm('নিশ্চিত ডিলিট করতে চান?')) {
+        hospitals = hospitals.filter(item => item.id !== id);
+        saveAllDataLocally();
+        renderHospitals();
+        showAlert('হাসপাতাল ডিলিট হয়েছে!', 'info');
+        deleteDoc(doc(db, "hospitals", id)).catch(err => console.log(err));
+      }
+    }
+
+    // ব্লাড ডোনার সাবমিট লজিক (নিখুঁতভাবে সংশোধিত যাতে ব্লাড ডাটা শুধু ব্লাডেই সেভ ও রেন্ডার হয়)
+    async function handleBloodSubmit(e) {
+      e.preventDefault();
+      const editingId = document.getElementById('editingDonorId').value;
+      const name = document.getElementById('bName').value.trim();
+      const group = document.getElementById('bGroup').value;
+      const phone = document.getElementById('bPhone').value.trim();
+      let inputCount = parseInt(document.getElementById('bDonateCount').value) || 1;
+      const lastDate = document.getElementById('bLastDate').value;
+      const fileInput = document.getElementById('bPhotoFile');
+
+      const saveDonorData = (photoBase64 = '') => {
+        closeBloodModal();
+        if (editingId) {
+          const idx = donors.findIndex(d => d.id === editingId);
+          if (idx !== -1) {
+            const oldDonor = donors[idx];
+            if (!currentUser || (!currentUser.isAdmin && oldDonor.addedByPhone !== currentUser.phone)) { 
+              showAlert('অনুমতি নেই!', 'error'); 
+              return; 
+            }
+            
+            let finalCount = inputCount;
+
+            if (!currentUser.isAdmin) {
+              if (oldDonor.lastDate !== lastDate) {
+                const oldDateObj = new Date(oldDonor.lastDate);
+                const newDateObj = new Date(lastDate);
+                const todayObj = new Date(); todayObj.setHours(0,0,0,0);
+                if (newDateObj > todayObj) { 
+                  alert(`⚠️ ভবিষ্যতের বা আজকের সময়ের পরের তারিখ দিয়ে রক্তদান আপডেট করা যাবে না!`); 
+                  return; 
+                }
+                const diffDays = Math.floor((newDateObj - oldDateObj) / (1000 * 60 * 60 * 24));
+                if (diffDays < 90) { 
+                  alert(`⚠️ রক্তদানের পর কমপক্ষে ৯০ দিন অতিবাহিত হতে হবে। মাত্র ${diffDays} দিন হয়েছে!`); 
+                  return; 
+                }
+              }
+            }
+
+            donors[idx] = { ...donors[idx], name, group, phone, count: finalCount, lastDate };
+            if (photoBase64) donors[idx].photo = photoBase64;
+            
+            saveAllDataLocally();
+            renderBloodDonors(); 
+            switchTab('bloodDonation'); // সেভ করার পর নিশ্চিতভাবে ব্লাড ট্যাবেই রাখবে
+            showAlert('ডোনার তথ্য সফলভাবে আপডেট করা হয়েছে!', 'success');
+            setDoc(doc(db, "donors", editingId), donors[idx]).catch(err => console.log(err));
+          }
+        } else {
+          if (!currentUser) { showAlert('প্রথমে লগইন করুন!', 'error'); openUserAuthModal(); return; }
+          const newObj = { id: 'DON_' + Date.now(), name, group, phone, count: inputCount, photo: photoBase64, lastDate, addedBy: getUserHistoryTag(currentUser), addedByPhone: currentUser.phone };
+          donors.push(newObj);
+          
+          saveAllDataLocally();
+          renderBloodDonors(); 
+          switchTab('bloodDonation'); // সেভ করার পর নিশ্চিতভাবে ব্লাড ট্যাবেই রাখবে
+          showAlert('ডোনার তালিকায় সফলভাবে যুক্ত হয়েছেন!', 'success');
+          setDoc(doc(db, "donors", newObj.id), newObj).catch(err => console.log(err));
+        }
+      };
+
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (uploadEvent) { saveDonorData(uploadEvent.target.result); };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        let existingPhoto = editingId ? (donors.find(d => d.id === editingId)?.photo || '') : '';
+        saveDonorData(existingPhoto);
+      }
+    }
+
+    function toggleEligibleDonorsFilter() {
+      showOnlyEligibleDonors = !showOnlyEligibleDonors;
+      const btn = document.getElementById('eligibleFilterBtn');
+      if (showOnlyEligibleDonors) {
+        btn.className = "px-3 py-1.5 bg-emerald-700 text-white text-xs font-bold rounded-lg shadow transition flex items-center gap-1.5 ring-2 ring-emerald-400";
+        btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> সকল ডোনার দেখা হচ্ছে (ফিল্টার অন)`;
+      } else {
+        btn.className = "px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow transition flex items-center gap-1.5";
+        btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> শুধু এখন যারা রক্তদানে যোগ্য`;
+      }
+      renderBloodDonors();
+    }
+
+    function renderBloodDonors() {
+      const container = document.getElementById('bloodDonorListContainer');
+      const filterGroup = document.getElementById('filterBloodGroup').value;
+      const today = new Date();
+      const filtered = donors.filter(d => {
+        const matchGroup = filterGroup === 'ALL' || d.group === filterGroup;
+        if (!matchGroup) return false;
+        if (showOnlyEligibleDonors) {
+          const nextEligibleDate = new Date(new Date(d.lastDate));
+          nextEligibleDate.setDate(nextEligibleDate.getDate() + 90);
+          return today >= nextEligibleDate;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) { container.innerHTML = `<div class="col-span-3 text-center text-slate-500 p-8">কোনো ডোনার পাওয়া যায়নি।</div>`; return; }
+      container.innerHTML = filtered.map(d => {
+        const nextEligibleDate = new Date(new Date(d.lastDate));
+        nextEligibleDate.setDate(nextEligibleDate.getDate() + 90);
+        const isEligible = today >= nextEligibleDate;
+        const eligibleStr = isEligible ? '<span class="text-emerald-600 font-bold">এখনই রক্তদান করতে পারবেন ✅</span>' : `<span class="text-amber-600 font-semibold">যোগ্য হবেন: ${nextEligibleDate.toLocaleDateString('bn-BD')}</span>`;
+
+        let avatarHtml = `<div class="w-12 h-12 rounded-full bg-red-100 text-red-700 font-bold flex items-center justify-center text-base cursor-pointer" title="ছবি দেখুন">${d.group}</div>`;
+        if (d.photo) avatarHtml = `<img src="${d.photo}" class="w-12 h-12 rounded-full object-cover border-2 border-red-500 cursor-pointer" onclick="zoomImage('${d.photo}')">`;
+
+        const canEdit = currentUser && (currentUser.isAdmin || currentUser.phone === d.addedByPhone);
+        const isFav = favorites.includes(d.id);
+
+        return `
+          <div class="p-4 border dark:border-slate-700 rounded-xl bg-white dark:bg-slate-700 shadow-sm space-y-3 border-l-4 border-l-red-500 relative">
+            <div class="absolute right-3 top-3">
+              <button onclick="toggleFavorite('${d.id}')" class="text-sm ${isFav ? 'text-red-500' : 'text-slate-400 hover:text-red-500'}"><i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i></button>
+            </div>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-3">${avatarHtml}<div><h3 class="font-bold text-base">${d.name}</h3><div class="flex items-center gap-1.5 mt-0.5"><span class="px-2 py-0.5 bg-red-50 text-red-600 text-xs font-bold rounded">গ্রুপ: ${d.group}</span><span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-bold rounded">দান: ${d.count || 1} বার</span></div></div></div>
+              <div class="flex items-center gap-2 pr-6">${canEdit ? `<button onclick="openBloodModal('${d.id}')" class="text-amber-600 text-xs bg-amber-50 px-2 py-1 rounded font-bold">এডিট</button>` : ''}${currentUser && currentUser.isAdmin ? `<button onclick="deleteDonor('${d.id}')" class="text-red-500 text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}</div>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-300">সর্বশেষ: <strong>${new Date(d.lastDate).toLocaleDateString('bn-BD')}</strong></p>
+            <div class="text-xs bg-slate-50 dark:bg-slate-800 p-2 rounded border dark:border-slate-600">${eligibleStr}</div>
+            ${currentUser && currentUser.isAdmin && d.addedBy ? `<div class="text-[11px] text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-slate-800 p-1.5 rounded">👤 সংযোজক: ${d.addedBy}</div>` : ''}
+            <div class="pt-2 border-t dark:border-slate-600 flex justify-between items-center text-xs gap-2">
+              <button onclick="viewDonorDetail('${d.id}')" class="px-3 py-1.5 bg-red-600 text-white font-semibold rounded-lg"><i class="fa-solid fa-eye"></i> বিস্তারিত</button>
+              <a href="tel:${d.phone}" class="bg-slate-800 dark:bg-slate-900 text-white px-3 py-1.5 rounded-lg font-semibold"><i class="fa-solid fa-phone"></i> ${d.phone}</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function deleteDonor(id) {
+      if (!currentUser || !currentUser.isAdmin) { showAlert('শুধুমাত্র এডমিন ডিলিট করতে পারবেন!', 'error'); return; }
+      if (confirm('নিশ্চিত ডিলিট করতে চান?')) {
+        donors = donors.filter(item => item.id !== id);
+        saveAllDataLocally();
+        renderBloodDonors();
+        showAlert('ডোনার ডিলিট হয়েছে!', 'info');
+        deleteDoc(doc(db, "donors", id)).catch(err => console.log(err));
+      }
+    }
+
+    async function handleTourismSubmit(e) {
+      e.preventDefault();
+      const editingId = document.getElementById('editingTourismId').value;
+      const category = document.getElementById('tCategory').value;
+      const title = document.getElementById('tTitle').value.trim();
+      const designation = document.getElementById('tDesignation').value.trim();
+      const desc = document.getElementById('tDesc').value.trim();
+
+      closeTourismModal();
+
+      if (editingId) {
+        if (!currentUser || !currentUser.isAdmin) { showAlert('অনুমতি নেই!', 'error'); return; }
+        const idx = tourismData.findIndex(i => i.id === editingId);
+        if (idx !== -1) {
+          tourismData[idx] = { ...tourismData[idx], category, title, designation, desc };
+          saveAllDataLocally();
+          renderTourism();
+          showAlert('তথ্য আপডেট হয়েছে!', 'success');
+          setDoc(doc(db, "tourism", editingId), tourismData[idx]).catch(err => console.log(err));
+        }
+      } else {
+        if (!currentUser) { showAlert('প্রথমে লগইন করুন!', 'error'); openUserAuthModal(); return; }
+        const newObj = { id: 'TR_' + Date.now(), category, title, designation, desc, addedBy: getUserHistoryTag(currentUser) };
+        tourismData.push(newObj);
+        saveAllDataLocally();
+        renderTourism();
+        showAlert('তথ্য যুক্ত হয়েছে!', 'success');
+        setDoc(doc(db, "tourism", newObj.id), newObj).catch(err => console.log(err));
+      }
+    }
+
+    function renderTourism() {
+      const introContainer = document.getElementById('introListContainer');
+      const tourismContainer = document.getElementById('tourismListContainer');
+      const foodContainer = document.getElementById('foodListContainer');
+
+      const intros = tourismData.filter(i => i.category === 'পরিচিতি');
+      const tourisms = tourismData.filter(i => i.category === 'পর্যটন');
+      const foods = tourismData.filter(i => i.category === 'খাবার');
+
+      const renderCards = (items) => {
+        if (items.length === 0) return `<div class="col-span-3 text-center text-slate-400 p-4 text-xs">কোনো তথ্য নেই।</div>`;
+        return items.map(item => `
+          <div class="p-4 border dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-700 shadow-sm space-y-2 relative">
+            <div class="flex justify-between items-start"><span class="px-2 py-0.5 text-xs font-bold rounded bg-emerald-100 text-emerald-800">${item.category}</span>
+              <div class="flex items-center gap-2">${currentUser && currentUser.isAdmin ? `<button onclick="openTourismModal('${item.id}')" class="text-amber-600 text-xs"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteTourism('${item.id}')" class="text-red-500 text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}</div>
+            </div>
+            <h4 class="font-bold text-base">${item.title}</h4>
+            ${item.designation ? `<p class="text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-slate-800 px-2 py-1 rounded inline-block">পদবি: ${item.designation}</p>` : ''}
+            <p class="text-xs text-slate-600 dark:text-slate-300 line-clamp-2">${item.desc}</p>
+            ${currentUser && currentUser.isAdmin && item.addedBy ? `<div class="text-[11px] text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-slate-800 p-1.5 rounded">👤 সংযোজক: ${item.addedBy}</div>` : ''}
+            <div class="pt-2 border-t dark:border-slate-600 flex justify-end">
+              <button onclick="viewTourismDetail('${item.id}')" class="px-3 py-1.5 bg-emerald-600 text-white font-semibold rounded-lg text-xs"><i class="fa-solid fa-eye"></i> বিস্তারিত</button>
+            </div>
+          </div>
+        `).join('');
+      };
+      introContainer.innerHTML = renderCards(intros);
+      tourismContainer.innerHTML = renderCards(tourisms);
+      foodContainer.innerHTML = renderCards(foods);
+    }
+
+    async function deleteTourism(id) {
+      if (!currentUser || !currentUser.isAdmin) { showAlert('শুধুমাত্র এডমিন ডিলিট করতে পারবেন!', 'error'); return; }
+      if (confirm('নিশ্চিত ডিলিট করতে চান?')) {
+        tourismData = tourismData.filter(item => item.id !== id);
+        saveAllDataLocally();
+        renderTourism();
+        showAlert('তথ্য ডিলিট হয়েছে!', 'info');
+        deleteDoc(doc(db, "tourism", id)).catch(err => console.log(err));
+      }
+    }
+
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      const editingId = document.getElementById('editingSchoolId').value;
+      const name = document.getElementById('schoolName').value.trim();
+      const code = document.getElementById('schoolCode').value.trim();
+      const type = document.getElementById('schoolType').value;
+      const location = document.getElementById('schoolLocation').value;
+      const address = document.getElementById('schoolAddress').value.trim();
+      const head = document.getElementById('headDetails').value.trim();
+
+      if (!VALID_HATIA_AREAS.includes(location) || !code || !address) { showAlert('এলাকা, স্কুল কোড ও ঠিকানা বাধ্যতামূলক!', 'error'); return; }
+
+      const classRows = document.querySelectorAll('#classRowsContainer > div');
+      const students = [];
+      classRows.forEach(row => {
+        const cls = row.querySelector('.classNameSelect').value;
+        const boys = parseInt(row.querySelector('.classBoysInput').value) || 0;
+        const girls = parseInt(row.querySelector('.classGirlsInput').value) || 0;
+        if (cls) students.push({ class: cls, boys, girls });
+      });
+
+      if (students.length === 0) { showAlert('কমপক্ষে একটি শ্রেণির তথ্য দিন!', 'error'); return; }
+
+      const teacherRows = document.querySelectorAll('#teachersContainer > div');
+      const teachers = [];
+      teacherRows.forEach(row => {
+        const tName = row.querySelector('.t-name').value.trim();
+        const tRole = row.querySelector('.t-role').value.trim();
+        const tPhone = row.querySelector('.t-phone').value.trim();
+        const tAddress = row.querySelector('.t-address').value.trim();
+        if (tName) teachers.push({ name: tName, role: tRole, phone: tPhone, address: tAddress });
+      });
+
+      closeAddSchoolModal();
+
+      if (editingId) {
+        if (!currentUser || !currentUser.isAdmin) { showAlert('অনুমতি নেই!', 'error'); return; }
+        const idx = schools.findIndex(s => s.id === editingId);
+        if (idx !== -1) {
+          schools[idx] = { ...schools[idx], name, code, type, location, address, head, students, teachers };
+          saveAllDataLocally();
+          renderSchools();
+          showAlert('শিক্ষা প্রতিষ্ঠানের তথ্য আপডেট হয়েছে!', 'success');
+          setDoc(doc(db, "schools", editingId), schools[idx]).catch(err => console.log(err));
+        }
+      } else {
+        if (!currentUser) { showAlert('প্রথমে লগইন করুন!', 'error'); openUserAuthModal(); return; }
+        const newObj = { id: 'SCH_' + Date.now(), name, code, type, location, address, head, students, teachers, addedBy: getUserHistoryTag(currentUser) };
+        schools.push(newObj);
+        saveAllDataLocally();
+        renderSchools();
+        showAlert('শিক্ষা প্রতিষ্ঠান সফলভাবে যুক্ত হয়েছে!', 'success');
+        setDoc(doc(db, "schools", newObj.id), newObj).catch(err => console.log(err));
+      }
+    }
+
+    async function deleteSchool(id) {
+      if (!currentUser || !currentUser.isAdmin) { showAlert('শুধুমাত্র এডমিন ডিলিট করতে পারবেন!', 'error'); return; }
+      if (confirm('নিশ্চিত ডিলিট করতে চান?')) {
+        schools = schools.filter(s => s.id !== id);
+        saveAllDataLocally();
+        renderSchools();
+        showAlert('শিক্ষা প্রতিষ্ঠান ডিলিট হয়েছে!', 'info');
+        deleteDoc(doc(db, "schools", id)).catch(err => console.log(err));
+      }
+    }
+
+    function viewSchoolDetail(id) {
+      const s = schools.find(item => item.id === id);
+      if (!s) return;
+      const totalBoys = s.students ? s.students.reduce((acc, c) => acc + (c.boys||0), 0) : 0;
+      const totalGirls = s.students ? s.students.reduce((acc, c) => acc + (c.girls||0), 0) : 0;
+      const shareText = encodeURIComponent(`শিক্ষা প্রতিষ্ঠান: ${s.name}\nএলাকা: ${s.location}\nমোট শিক্ষার্থী: ${totalBoys + totalGirls} জন`);
+
+      const container = document.getElementById('schoolDetailContent');
+      container.innerHTML = `
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-md border dark:border-slate-700 p-6 md:p-8 space-y-6">
+          <div class="border-b dark:border-slate-700 pb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap mb-2">
+                <span class="px-3 py-1 text-xs font-bold rounded-full bg-blue-100 text-blue-800">${s.type}</span>
+                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-800">কোড: ${s.code || 'নেই'}</span>
+                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800">${s.location}</span>
+              </div>
+              <h2 class="text-2xl md:text-3xl font-bold">${s.name}</h2>
+              <p class="text-sm text-slate-600 dark:text-slate-300 mt-1"><i class="fa-solid fa-map-pin text-emerald-600 mr-1"></i> ঠিকানা: ${s.address || 'নেই'}</p>
+              <p class="text-sm text-slate-600 dark:text-slate-300 mt-0.5"><i class="fa-solid fa-user-tie text-emerald-600 mr-1"></i> প্রধান: ${s.head || 'নেই'}</p>
+              ${currentUser && currentUser.isAdmin && s.addedBy ? `<p class="text-xs text-amber-700 dark:text-amber-300 mt-2 bg-amber-50 dark:bg-slate-700 p-2 rounded">👤 সংযোজক ইউজার: ${s.addedBy}</p>` : ''}
+              <div class="flex items-center gap-2 mt-3">
+                <span class="text-xs font-bold text-slate-500">শেয়ার করুন:</span>
+                <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" target="_blank" class="bg-blue-600 text-white px-3 py-1 rounded text-xs font-bold"><i class="fa-brands fa-facebook"></i> ফেসবুক</a>
+                <a href="https://api.whatsapp.com/send?text=${shareText}" target="_blank" class="bg-emerald-600 text-white px-3 py-1 rounded text-xs font-bold"><i class="fa-brands fa-whatsapp"></i> হোয়াটসঅ্যাপ</a>
+              </div>
+            </div>
+            <div class="bg-emerald-50 dark:bg-slate-700 border border-emerald-200 dark:border-slate-600 p-4 rounded-xl text-center min-w-[200px]">
+              <div class="text-xs text-emerald-800 dark:text-emerald-300 font-semibold">মোট শিক্ষার্থী</div>
+              <div class="text-2xl font-bold text-emerald-700 dark:text-emerald-400">${totalBoys + totalGirls} জন</div>
+              <div class="text-xs text-slate-500 dark:text-slate-300 mt-1">ছাত্র: ${totalBoys} | ছাত্রী: ${totalGirls}</div>
+            </div>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold mb-3"><i class="fa-solid fa-users-rectangle text-emerald-600"></i> শ্রেণিভিত্তিক ছাত্র ও ছাত্রী সংখ্যা</h3>
+            <div class="overflow-x-auto border dark:border-slate-700 rounded-xl">
+              <table class="w-full text-left border-collapse text-sm">
+                <thead><tr class="bg-slate-100 dark:bg-slate-700 border-b dark:border-slate-600"><th class="p-3">শ্রেণি</th><th class="p-3 text-center">ছাত্র</th><th class="p-3 text-center">ছাত্রী</th><th class="p-3 text-center">মোট</th></tr></thead>
+                <tbody>
+                  ${s.students && s.students.length > 0 ? s.students.map(st => `
+                    <tr class="border-b dark:border-slate-700">
+                      <td class="p-3 font-semibold">${st.class}</td>
+                      <td class="p-3 text-center text-blue-600 dark:text-blue-400">${st.boys}</td>
+                      <td class="p-3 text-center text-pink-600 dark:text-pink-400">${st.girls}</td>
+                      <td class="p-3 text-center font-bold">${st.boys + st.girls}</td>
+                    </tr>
+                  `).join('') : '<tr><td colspan="4" class="p-4 text-center">তথ্য নেই</td></tr>'}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold mb-3"><i class="fa-solid fa-chalkboard-user text-emerald-600"></i> শিক্ষকবৃন্দের তালিকা</h3>
+            ${s.teachers && s.teachers.length > 0 ? `
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                ${s.teachers.map(t => `
+                  <div class="bg-slate-50 dark:bg-slate-700 border dark:border-slate-600 rounded-xl p-4 flex flex-col justify-between space-y-2">
+                    <div><h4 class="font-bold text-base">${t.name}</h4><p class="text-xs text-emerald-700 dark:text-emerald-300 font-semibold">${t.role || 'শিক্ষক'}</p><p class="text-xs text-slate-500 dark:text-slate-300 mt-1">ঠিকানা: ${t.address || 'নেই'}</p></div>
+                    <div class="pt-2 border-t dark:border-slate-600 flex justify-between items-center"><span class="text-xs">মোবাইল:</span><a href="tel:${t.phone}" class="bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg"><i class="fa-solid fa-phone"></i> ${t.phone || 'নেই'}</a></div>
+                  </div>
+                `).join('')}
+              </div>
+            ` : `<p class="text-xs text-slate-500 p-4 text-center">শিক্ষকের তথ্য নেই।</p>`}
+          </div>
+        </div>
+      `;
+      switchTab('schoolDetail');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderSchools() {
+      const container = document.getElementById('schoolListContainer');
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const areaFilter = document.getElementById('filterUnion').value;
+      const typeFilter = document.getElementById('filterType').value;
+      document.getElementById('selectedAreaText').innerText = areaFilter === 'ALL' ? 'সকল এলাকা / ইউনিয়ন' : areaFilter;
+
+      const mapLink = document.getElementById('unionMapLink');
+      if (areaFilter !== 'ALL') {
+        mapLink.classList.remove('hidden');
+        mapLink.classList.add('inline-flex');
+        mapLink.href = `https://maps.google.com/?q=${encodeURIComponent(areaFilter + ', Hatia, Noakhali')}`;
+      } else {
+        mapLink.classList.add('hidden');
+        mapLink.classList.remove('inline-flex');
+      }
+
+      let schoolBoys = 0, schoolGirls = 0, schoolCount = 0;
+      let madrasaBoys = 0, madrasaGirls = 0, madrasaCount = 0;
+      let collegeBoys = 0, collegeGirls = 0, collegeCount = 0;
+
+      schools.forEach(s => {
+        let b = 0, g = 0;
+        if (s.students) s.students.forEach(st => { b += st.boys || 0; g += st.girls || 0; });
+        if (s.type === 'স্কুল') { schoolCount++; schoolBoys += b; schoolGirls += g; }
+        else if (s.type === 'মাদ্রাসা') { madrasaCount++; madrasaBoys += b; madrasaGirls += g; }
+        else if (s.type === 'কলেজ/অন্যান্য') { collegeCount++; collegeBoys += b; collegeGirls += g; }
+      });
+
+      document.getElementById('schoolTypeCount').innerText = schoolCount;
+      document.getElementById('schoolBoysCount').innerText = schoolBoys;
+      document.getElementById('schoolGirlsCount').innerText = schoolGirls;
+      document.getElementById('schoolTotalCount').innerText = schoolBoys + schoolGirls;
+      document.getElementById('madrasaTypeCount').innerText = madrasaCount;
+      document.getElementById('madrasaBoysCount').innerText = madrasaBoys;
+      document.getElementById('madrasaGirlsCount').innerText = madrasaGirls;
+      document.getElementById('madrasaTotalCount').innerText = madrasaBoys + madrasaGirls;
+      document.getElementById('collegeTypeCount').innerText = collegeCount;
+      document.getElementById('collegeBoysCount').innerText = collegeBoys;
+      document.getElementById('collegeGirlsCount').innerText = collegeGirls;
+      document.getElementById('collegeTotalCount').innerText = collegeBoys + collegeGirls;
+
+      const filtered = schools.filter(s => {
+        const matchSearch = s.name.toLowerCase().includes(search) || (s.code && s.code.toLowerCase().includes(search));
+        const matchArea = areaFilter === 'ALL' || s.location === areaFilter;
+        const matchType = typeFilter === 'ALL' || s.type === typeFilter;
+        return matchSearch && matchArea && matchType;
+      });
+
+      let totalSum = 0;
+      filtered.forEach(s => { if (s.students) s.students.forEach(st => { totalSum += (st.boys || 0) + (st.girls || 0); }); });
+
+      document.getElementById('totalStudentsSum').innerText = `মোট শিক্ষার্থী: ${totalSum} জন`;
+      document.getElementById('totalMatchCount').innerText = `${filtered.length} টি প্রতিষ্ঠান`;
+
+      if (filtered.length === 0) { container.innerHTML = `<div class="bg-white dark:bg-slate-800 p-12 text-center rounded-xl border dark:border-slate-700 text-slate-500"><p>কোনো তথ্য পাওয়া যায়নি!</p></div>`; return; }
+
+      container.innerHTML = filtered.map(s => {
+        const totalBoys = s.students ? s.students.reduce((acc, c) => acc + (c.boys||0), 0) : 0;
+        const totalGirls = s.students ? s.students.reduce((acc, c) => acc + (c.girls||0), 0) : 0;
+        const isFav = favorites.includes(s.id);
+
+        return `
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border dark:border-slate-700 p-4 md:p-6 space-y-4 relative">
+            <div class="absolute right-4 top-4">
+              <button onclick="toggleFavorite('${s.id}')" class="text-base ${isFav ? 'text-red-500' : 'text-slate-400 hover:text-red-500'}"><i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i></button>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-start gap-4">
+              <div class="space-y-1.5 flex-grow pr-8">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="px-2.5 py-0.5 text-xs font-bold rounded bg-blue-100 text-blue-800">${s.type}</span>
+                  <span class="px-2.5 py-0.5 text-xs font-semibold rounded bg-amber-100 text-amber-800">কোড: ${s.code || 'নেই'}</span>
+                  <span class="px-2.5 py-0.5 text-xs font-semibold rounded bg-emerald-100 text-emerald-800">${s.location}</span>
+                </div>
+                <h3 class="text-xl font-bold hover:text-emerald-600 cursor-pointer" onclick="viewSchoolDetail('${s.id}')">${s.name}</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">ঠিকানা: ${s.address || 'নেই'}</p>
+                ${currentUser && currentUser.isAdmin && s.addedBy ? `<p class="text-[11px] text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-slate-700 p-1 rounded inline-block">👤 সংযোজক: ${s.addedBy}</p>` : ''}
+              </div>
+              <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+                <button onclick="viewSchoolDetail('${s.id}')" class="px-4 py-2 bg-emerald-600 text-white text-xs font-semibold rounded-lg"><i class="fa-solid fa-eye"></i> বিস্তারিত</button>
+                ${currentUser && currentUser.isAdmin ? `<button onclick="openAddSchoolModal('${s.id}')" class="px-3 py-2 bg-amber-500 text-white text-xs rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteSchool('${s.id}')" class="px-3 py-2 bg-red-600 text-white text-xs rounded-lg"><i class="fa-solid fa-trash"></i></button>` : ''}
+              </div>
+            </div>
+            <div class="grid grid-cols-3 text-center bg-slate-50 dark:bg-slate-700 p-3 rounded-lg text-xs border dark:border-slate-600">
+              <div>মোট শিক্ষার্থী: <strong class="text-emerald-700 dark:text-emerald-400">${totalBoys + totalGirls}</strong> জন</div>
+              <div>ছাত্র: <strong class="text-blue-600 dark:text-blue-400">${totalBoys}</strong> জন</div>
+              <div>ছাত্রী: <strong class="text-pink-600 dark:text-pink-400">${totalGirls}</strong> জন</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderAuthStatus() {
+      const dropdownAuthArea = document.getElementById('headerDropdownAuthArea');
+      const adminBackupSection = document.getElementById('adminBackupRestoreSection');
+      const editBtn = document.getElementById('editNoticeBtn');
+      const views = localStorage.getItem('site_total_views') || 0;
+      let registeredLogins = JSON.parse(localStorage.getItem('site_login_users') || '[]');
+      
+      if(document.getElementById('totalViewsDisplay')) document.getElementById('totalViewsDisplay').innerText = views;
+      if(document.getElementById('totalLoginsDisplay')) document.getElementById('totalLoginsDisplay').innerText = registeredLogins.length;
+      if(document.getElementById('totalViewsMobile')) document.getElementById('totalViewsMobile').innerText = views;
+      if(document.getElementById('totalLoginsMobile')) document.getElementById('totalLoginsMobile').innerText = registeredLogins.length;
+
+      if (currentUser && currentUser.isAdmin) {
+        if (editBtn) editBtn.classList.remove('hidden');
+        if (adminBackupSection) adminBackupSection.classList.remove('hidden');
+      } else {
+        if (editBtn) editBtn.classList.add('hidden');
+        if (adminBackupSection) adminBackupSection.classList.add('hidden');
+      }
+
+      let html = '';
+      if (currentUser) {
+        html += `
+          <div class="space-y-1.5">
+            <div class="px-3 py-1.5 bg-emerald-50 dark:bg-slate-700 rounded-lg text-emerald-800 dark:text-emerald-200 font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-user"></i> ${currentUser.name || currentUser.phone}
+            </div>
+            ${currentUser.isAdmin ? `<button onclick="resetAllStats(); toggleHeaderMenu();" class="w-full text-left px-3 py-2 hover:bg-red-50 text-red-600 rounded-lg font-medium flex items-center gap-2"><i class="fa-solid fa-rotate-right"></i> রিসেট কাউন্ট</button>` : ''}
+            <button onclick="logout(); toggleHeaderMenu();" class="w-full text-left px-3 py-2 hover:bg-red-50 text-red-600 rounded-lg font-medium flex items-center gap-2">
+              <i class="fa-solid fa-right-from-bracket"></i> লগআউট
+            </button>
+          </div>
+        `;
+      } else {
+        html += `
+          <button onclick="openUserAuthModal(); toggleHeaderMenu();" class="w-full text-center py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow">
+            <i class="fa-solid fa-right-to-bracket mr-1"></i> লগইন / রেজিস্টার
+          </button>
+        `;
+      }
+      
+      if (dropdownAuthArea) dropdownAuthArea.innerHTML = html;
+    }
+
+    function toggleHeaderMenu() {
+      const menu = document.getElementById('headerDropdownMenu');
+      if(menu) menu.classList.toggle('hidden');
+    }
+
+    window.addEventListener('click', function(e) {
+      const menu = document.getElementById('headerDropdownMenu');
+      const btn = menu?.previousElementSibling;
+      if (menu && !menu.classList.contains('hidden') && !menu.contains(e.target) && !btn.contains(e.target)) {
+        menu.classList.add('hidden');
+      }
+    });
+
+    function openUserAuthModal() {
+      document.getElementById('adminAuthModal').classList.add('hidden');
+      document.getElementById('userAuthModal').classList.remove('hidden');
+      switchUserAuthSubMode('login');
+    }
+
+    function closeUserAuthModal() {
+      if (!currentUser) {
+        document.body.innerHTML = '<div style="background:#0f172a; color:#fff; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:sans-serif; font-size:20px; text-align:center; padding:20px;"><h2>সেবাটি বন্ধ রয়েছে</h2><p style="font-size:14px; color:#94a3b8; margin-top:10px;">পুনরায় প্রবেশ করতে পেজটি রিফ্রেশ করুন।</p></div>';
+      } else {
+        document.getElementById('userAuthModal').classList.add('hidden');
+      }
+    }
+
+    function openAdminAuthModal() {
+      document.getElementById('userAuthModal').classList.add('hidden');
+      document.getElementById('adminAuthModal').classList.remove('hidden');
+    }
+
+    function closeAdminAuthModal() {
+      if (!currentUser) {
+        document.body.innerHTML = '<div style="background:#0f172a; color:#fff; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:sans-serif; font-size:20px; text-align:center; padding:20px;"><h2>সেবাটি বন্ধ রয়েছে</h2><p style="font-size:14px; color:#94a3b8; margin-top:10px;">পুনরায় প্রবেশ করতে পেজটি রিফ্রেশ করুন।</p></div>';
+      } else {
+        document.getElementById('adminAuthModal').classList.add('hidden');
+      }
+    }
+
+    function switchUserAuthSubMode(mode) {
+      userAuthMode = mode;
+      const title = document.getElementById('userAuthModalTitle');
+      const btn = document.getElementById('userAuthSubmitBtn');
+      const passInput = document.getElementById('userAuthPass');
+      const regNameWrapper = document.getElementById('userRegNameWrapper');
+      const regNidWrapper = document.getElementById('userRegNidWrapper');
+      const regToggleBtn = document.getElementById('userRegToggleBtn');
+      const loginToggleBtn = document.getElementById('userLoginToggleBtn');
+
+      if (mode === 'login') {
+        title.innerText = 'সাধারণ ইউজার প্রবেশ'; btn.innerText = 'লগইন করুন'; passInput.placeholder = "পাসওয়ার্ড";
+        regNameWrapper.classList.add('hidden'); regNidWrapper.classList.add('hidden'); regToggleBtn.classList.remove('hidden'); loginToggleBtn.classList.add('hidden');
+      } else if (mode === 'register') {
+        title.innerText = 'ইউজার রেজিস্ট্রেশন'; btn.innerText = 'রেজিস্টার'; passInput.placeholder = "পাসওয়ার্ড দিন";
+        regNameWrapper.classList.remove('hidden'); regNidWrapper.classList.remove('hidden'); regToggleBtn.classList.add('hidden'); loginToggleBtn.classList.remove('hidden');
+      } else if (mode === 'forgot') {
+        title.innerText = 'পাসওয়ার্ড রিকভারি'; btn.innerText = 'নতুন পাসওয়ার্ড সেট করুন'; passInput.placeholder = "নতুন পাসওয়ার্ড";
+        regNameWrapper.classList.add('hidden'); regNidWrapper.classList.add('hidden'); regToggleBtn.classList.remove('hidden'); loginToggleBtn.classList.add('hidden');
+      }
+    }
+
+    function playWelcomeSound() {
+      const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
+      audio.play().catch(err => console.log("Audio play blocked:", err));
+    }
+
+    function showAdminWelcomePopup(userName) {
+      playWelcomeSound();
+      document.getElementById('adminWelcomeModal').classList.remove('hidden');
+    }
+
+    function closeAdminWelcomeModal() {
+      document.getElementById('adminWelcomeModal').classList.add('hidden');
+    }
+
+    function showUserWelcomePopup(userName) {
+      playWelcomeSound();
+      document.getElementById('userWelcomeText').innerText = `${userName}, হাতিয়া তথ্য ও সেবা ডিরেক্টরিতে আপনাকে স্বাগতম! সচেতন মানুষের মেলবন্ধনে গড়া এই প্ল্যাটফর্মে আপনার উপস্থিতি আমাদের বড় প্রেরণা। শিক্ষা, চিকিৎসা কিংবা জরুরি প্রয়োজনে একে অপরের পাশে দাঁড়ানোর মানসিকতাই আমাদের শক্তি। সাথে থাকার জন্য ধন্যবাদ! 💚`;
+      document.getElementById('userWelcomeModal').classList.remove('hidden');
+    }
+
+    function closeUserWelcomeModal() {
+      document.getElementById('userWelcomeModal').classList.add('hidden');
+    }
+
+    async function handleUserAuthSubmit(e) {
+      e.preventDefault();
+      const phone = document.getElementById('userAuthPhone').value.trim();
+      const pass = document.getElementById('userAuthPass').value.trim();
+      const name = document.getElementById('userAuthName').value.trim();
+      const nid = document.getElementById('userAuthNid').value.trim();
+
+      if (userAuthMode === 'register') {
+        if (!name || !nid) { showAlert('নাম ও NID দিন!', 'error'); return; }
+        if (nid.length !== 10 && nid.length !== 13 && nid.length !== 17) { showAlert('সঠিক NID দিন!', 'error'); return; }
+        if (users.find(u => u.phone === phone || u.nid === nid)) { showAlert('ইতিমধ্যে একাউন্ট আছে!', 'error'); return; }
+        const newUser = { id: 'USER_' + Date.now(), phone, pass, name, nid, isAdmin: false };
+        users.push(newUser);
+        currentUser = newUser; 
+        localStorage.setItem('hatia_logged_user', JSON.stringify(currentUser));
+        localStorage.setItem('is_admin_logged_in', 'false'); 
+        trackLoginUser(phone, false);
+        saveAllDataLocally();
+        
+        closeUserAuthModal();
+        setDoc(doc(db, "users", newUser.id), newUser).catch(err => console.log(err));
+      } else if (userAuthMode === 'login') {
+        const found = users.find(u => u.phone === phone && u.pass === pass);
+        if (!found) { showAlert('নম্বর বা পাসওয়ার্ড ভুল!', 'error'); return; }
+        currentUser = found; 
+        localStorage.setItem('hatia_logged_user', JSON.stringify(currentUser));
+        localStorage.setItem('is_admin_logged_in', 'false'); 
+        trackLoginUser(phone, false);
+        saveAllDataLocally();
+        
+        closeUserAuthModal();
+      } else if (userAuthMode === 'forgot') {
+        const userObj = users.find(u => u.phone === phone);
+        if (!userObj) { showAlert('নম্বরটি রেজিস্টার্ড নয়!', 'error'); return; }
+        userObj.pass = pass;
+        currentUser = userObj; 
+        localStorage.setItem('hatia_logged_user', JSON.stringify(currentUser));
+        localStorage.setItem('is_admin_logged_in', 'false');
+        saveAllDataLocally();
+        
+        closeUserAuthModal();
+        showAlert(`🎉 পাসওয়ার্ড পরিবর্তন সফল হয়েছে!`, 'success');
+        setDoc(doc(db, "users", userObj.id), userObj).catch(err => console.log(err));
+      }
+      
+      document.body.classList.remove('logged-out-lock');
+
+      renderAuthStatus(); 
+      renderSchools(); 
+      renderHospitals(); 
+      renderBloodDonors(); 
+      renderTourism(); 
+      renderHotlines(); 
+      renderJobs(); 
+      updateStatsDisplay();
+
+      showUserWelcomePopup(currentUser.name || 'সম্মানিত ইউজার');
+    }
+
+    async function handleAdminAuthSubmit(e) {
+      e.preventDefault();
+      const phone = document.getElementById('adminAuthPhone').value.trim();
+      const pass = document.getElementById('adminAuthPass').value.trim();
+
+      if (phone === ADMIN_PHONE && pass === ADMIN_PASS) {
+        currentUser = { phone: ADMIN_PHONE, name: 'আরাবী', nid: 'N/A', isAdmin: true };
+        localStorage.setItem('hatia_logged_user', JSON.stringify(currentUser));
+        localStorage.setItem('is_admin_logged_in', 'true');
+        saveAllDataLocally();
+        
+        closeAdminAuthModal(); 
+        document.body.classList.remove('logged-out-lock');
+        
+        renderAuthStatus(); 
+        renderSchools(); 
+        renderHospitals(); 
+        renderBloodDonors(); 
+        renderTourism(); 
+        renderHotlines(); 
+        renderJobs(); 
+        updateStatsDisplay();
+
+        showAdminWelcomePopup(currentUser.name);
+        return;
+      } else {
+        showAlert('অ্যাডমিন মোবাইল বা পাসওয়ার্ড ভুল!', 'error');
+      }
+    }
+
+    function logout() {
+      currentUser = null; 
+      localStorage.removeItem('hatia_logged_user'); 
+      localStorage.setItem('is_admin_logged_in', 'false');
+      
+      renderAuthStatus(); 
+      renderSchools(); 
+      renderHospitals(); 
+      renderBloodDonors(); 
+      renderTourism(); 
+      renderHotlines(); 
+      renderJobs(); 
+      updateStatsDisplay(); 
+      
+      document.body.classList.add('logged-out-lock');
+
+      showAlert('লগআউট করা হয়েছে।', 'info');
+      openUserAuthModal();
+    }
+
+    function showAlert(msg, type = 'info') {
+      const box = document.getElementById('alertBox');
+      box.className = `mb-4 p-4 rounded-lg font-medium shadow-sm ${type === 'success' ? 'bg-emerald-100 text-emerald-800' : type === 'error' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}`;
+      box.innerText = msg; box.classList.remove('hidden');
+      setTimeout(() => box.classList.add('hidden'), 4000);
+    }
+  </script>
+</body>
+</html>
